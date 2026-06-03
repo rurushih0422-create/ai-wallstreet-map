@@ -36,7 +36,11 @@
   .dot{display:inline-block; width:9px;height:9px;border-radius:50%; vertical-align:middle; margin-right:4px}
   .dot.g{background:var(--green)} .dot.y{background:var(--yellow)} .dot.r{background:var(--red)}
   .ring{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:middle;margin-right:4px;border:2px solid}
-  .ring.big{background:#000;border-color:#000} .ring.mid{border-color:var(--blue)} .ring.small{border-color:var(--gold)}
+  .ring.big{background:#000;border-color:#fff} .ring.mid{border-color:var(--blue)} .ring.small{border-color:var(--gold)}
+  .htag{font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:999px;margin-left:4px;line-height:1.5;vertical-align:middle;white-space:nowrap}
+  .htag.L{background:rgba(40,199,135,.16);color:#3fd89a;border:1px solid rgba(40,199,135,.45)}
+  .htag.M{background:rgba(90,150,255,.16);color:#86b0ff;border:1px solid rgba(90,150,255,.45)}
+  .htag.S{background:rgba(255,140,60,.16);color:#ffa257;border:1px solid rgba(255,140,60,.5)}
 
   section{margin-top:40px}
   .sec-head{display:flex; align-items:center; gap:10px; margin-bottom:6px}
@@ -154,6 +158,11 @@
     <span><span class="ring big"></span>大型權值</span>
     <span><span class="ring mid"></span>中型成長</span>
     <span><span class="ring small"></span>中小飆股</span>
+    <span style="opacity:.4">｜</span>
+    <span><b>角落＝持有時間軸</b></span>
+    <span><span class="htag L">長</span>可長抱好公司</span>
+    <span><span class="htag M">中</span>題材成長·等位置</span>
+    <span><span class="htag S">短</span>波動大·偏觀察(非買進)</span>
     <span style="opacity:.4">｜</span>
     <span><span class="check" style="color:var(--green);font-weight:700">✓</span> ＝已做六面報告</span>
     <span style="opacity:.4">｜</span>
@@ -509,6 +518,37 @@ document.querySelectorAll('.chip').forEach(ch=>{
     }
   }
 });
+
+// ---- 持有時間軸小標籤（長/中/短）：角落貼分類，非投資建議 ----
+// L=長期(護城河好公司可長抱) M=中期(題材成長·等位置分批) S=短期(波動大/早期/循環/想像·偏觀察)
+const HORIZON = {
+  // 長期 · 大型權值績優、可長抱
+  "2330":"L","2308":"L","2317":"L","2382":"L",
+  // 中期 · 題材成長、等位置分批
+  "3017":"M","3324":"M","2345":"M","3037":"M","1519":"M","2376":"M","2327":"M","2377":"M",
+  "2049":"M","6188":"M","2313":"M","2383":"M","6274":"M","3105":"M","8068":"M","4931":"M",
+  "3595":"M","6442":"M","4979":"M","3081":"M",
+  // 短期 · 波動大/早期/循環/想像、偏觀察（不是叫你買）
+  "3260":"S","4967":"S","2464":"S","3481":"S","8027":"S","4971":"S","3363":"S",
+  "INFQ":"S","IONQ":"S","RGTI":"S","QBTS":"S"
+};
+const HLABEL={L:"長",M:"中",S:"短"};
+const HTIP={L:"長期 · 護城河好公司、可長抱",M:"中期 · 題材成長、等位置再分批",S:"短期 · 波動大/早期/循環/想像，偏觀察（非買進建議）"};
+(function(){
+  const hkeys=Object.keys(HORIZON).sort((a,b)=>b.length-a.length);
+  document.querySelectorAll('.chip, .etf').forEach(el=>{
+    if(el.querySelector('.htag')) return;
+    const txt=el.textContent;
+    for(const k of hkeys){
+      if(txt.includes(k)){
+        const h=HORIZON[k];
+        const s=document.createElement('span');
+        s.className='htag '+h; s.textContent=HLABEL[h]; s.title=HTIP[h];
+        el.appendChild(s); break;
+      }
+    }
+  });
+})();
 
 // ---- 回檔燈號：讀 data.json，幫每張卡片亮燈 ----
 fetch('./data.json?_='+Date.now()).then(r=>r.json()).then(D=>{
