@@ -91,6 +91,10 @@
   .hideStatus-y [data-st="y"], .hideStatus-r [data-st="r"]{display:none}
   .onlyDone .chip:not(.done){display:none}
   .onlyDD20 .chip:not(.dd-green), .onlyDD20 .etf:not(.dd-green){display:none}
+  .onlyRS .chip:not(.rs-strong), .onlyRS .etf:not(.rs-strong){display:none}
+  .onlyGem .chip:not(.dd-green), .onlyGem .etf:not(.dd-green){display:none}
+  .onlyGem .chip:not(.hz-L), .onlyGem .etf:not(.hz-L){display:none}
+  .rsb{margin-left:4px;font-size:11px;vertical-align:middle}
   footer{margin-top:50px; text-align:center; color:var(--muted); font-size:12px; border-top:1px solid var(--line); padding-top:20px}
   .pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--sub);margin-left:6px}
   .etfgrid{display:flex;flex-direction:column;gap:8px;margin-top:10px}
@@ -149,6 +153,8 @@
     <button class="navbtn" id="fGreen">只看 ✅ 已兌現</button>
     <button class="navbtn" id="fDone">只看 ✓ 已做功課</button>
     <button class="navbtn" id="fDD20">🟢 只看回檔&gt;20%（可分批）</button>
+    <button class="navbtn" id="fRS">💪 相對強／抗跌</button>
+    <button class="navbtn" id="fGem">🎯 體質好又回檔</button>
   </div>
   <div class="legend">
     <span><b>🚦 卡片小圓燈＝回檔（每日更新）</b></span>
@@ -486,12 +492,14 @@ addEventListener('scroll',()=>{
 
 // ---- filters ----
 const body=document.body;
-function clearF(){body.classList.remove('hideStatus-y','hideStatus-r','onlyDone','onlyDD20');
-  document.querySelectorAll('#fAll,#fGreen,#fDone,#fDD20').forEach(b=>b.classList.remove('on'));}
+function clearF(){body.classList.remove('hideStatus-y','hideStatus-r','onlyDone','onlyDD20','onlyRS','onlyGem');
+  document.querySelectorAll('#fAll,#fGreen,#fDone,#fDD20,#fRS,#fGem').forEach(b=>b.classList.remove('on'));}
 document.getElementById('fAll').onclick=e=>{clearF();e.target.classList.add('on');};
 document.getElementById('fGreen').onclick=e=>{clearF();body.classList.add('hideStatus-y','hideStatus-r');e.target.classList.add('on');};
 document.getElementById('fDone').onclick=e=>{clearF();body.classList.add('onlyDone');e.target.classList.add('on');};
 document.getElementById('fDD20').onclick=e=>{clearF();body.classList.add('onlyDD20');e.target.classList.add('on');};
+document.getElementById('fRS').onclick=e=>{clearF();body.classList.add('onlyRS');e.target.classList.add('on');};
+document.getElementById('fGem').onclick=e=>{clearF();body.classList.add('onlyGem');e.target.classList.add('on');};
 document.getElementById('fAll').classList.add('on');
 
 // ---- 方格子文章連結：代號 → 網址，自動掃描所有股票標籤接上 ----
@@ -545,6 +553,7 @@ const HTIP={L:"長期 · 護城河好公司、可長抱",M:"中期 · 題材成�
     for(const k of hkeys){
       if(txt.includes(k)){
         const h=HORIZON[k];
+        el.classList.add('hz-'+h);
         const s=document.createElement('span');
         s.className='htag '+h; s.textContent=HLABEL[h]; s.title=HTIP[h];
         el.appendChild(s); break;
@@ -566,14 +575,21 @@ fetch('./data.json?_='+Date.now()).then(r=>r.json()).then(D=>{
         el.classList.add('dd-'+it.light);
         const s=document.createElement('span');
         s.className='light light-'+it.light;
-        s.title='距52週高 回檔 '+it.dd+'%（'+ZH[it.light]+'）';
+        let tip='距52週高 回檔 '+it.dd+'%（'+ZH[it.light]+'）';
+        if(typeof it.rs==='number'){
+          el.classList.add(it.rs>0?'rs-strong':'rs-weak');
+          tip+='｜近月相對大盤 '+(it.rs>0?'+':'')+it.rs+'%';
+          if(it.rs>0){ const b=document.createElement('span'); b.className='rsb'; b.textContent='💪'; b.title='近月贏大盤 +'+it.rs+'%（相對強／抗跌）'; el.appendChild(b); }
+        }
+        s.title=tip;
         el.insertBefore(s, el.firstChild);
         break;
       }
     }
   });
   const u=document.getElementById('lightUpdated');
-  if(u) u.textContent='🚦 回檔燈號更新：'+D.updated+'（每日自動）';
+  if(u){ const b=D.bench||{}; const f=v=>v==null?'—':((v>0?'+':'')+v+'%');
+    u.textContent='🚦 每日自動更新：'+D.updated+'｜近月大盤 台股 '+f(b.tw)+' / 美股 '+f(b.us)+'（大盤翻黑時，💪 才是真抗跌）'; }
 }).catch(()=>{ const u=document.getElementById('lightUpdated'); if(u) u.textContent='🚦 回檔燈號：資料載入中或暫無'; });
 
 // ---- ETF 可展開卡片：四大核心分析 ----

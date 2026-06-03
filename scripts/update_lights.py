@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-# 每天撈「現價 + 52週高」，算回檔%，產生回檔燈號 data.json
-# 燈號規則：回檔 >20% = green（可分批）/ 10–20% = yellow（觀察）/ <10% = red（偏高別追）
+# 每天撈「現價 + 52週高 + 近20日報酬」，算回檔燈號 + 相對強度(抗跌力)，產生 data.json
+# 回檔燈號：距52週高 >20%=green(可分批) / 10–20%=yellow(觀察) / <10%=red(偏高)
+# 相對強度：近1月報酬 − 對應大盤(台股比0050、美股比VOO)。>0=近月贏大盤(強勢/抗跌)
 import json, urllib.request, datetime, sys
 
 # 前端比對用的「代號」: Yahoo 代號（台股給裸碼，下面自動試 .TW / .TWO）
@@ -31,8 +32,18 @@ def _get(sym):
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=20) as r:
         d = json.load(r)
-    m = d["chart"]["result"][0]["meta"]
-    return float(m["regularMarketPrice"]), float(m["fiftyTwoWeekHigh"])
+    res = d["chart"]["result"][0]
+    m = res["meta"]
+    price, high = float(m["regularMarketPrice"]), float(m["fiftyTwoWeekHigh"])
+    # 近20交易日（約1個月）報酬，用來算相對強度
+    closes = [c for c in res["indicators"]["quote"][0]["close"] if c is not None]
+    if len(closes) >= 21:
+        r20 = round((closes[-1] / closes[-21] - 1) * 100, 1)
+    elif len(closes) >= 2:
+        r20 = round((closes[-1] / closes[0] - 1) * 100, 1)
+    else:
+        r20 = 0.0
+    return price, high, r20
 
 def fetch(sym):
     # 純數字（台股）：先試 .TW（上市），失敗再試 .TWO（上櫃）
@@ -47,14 +58,26 @@ items = {}
 fail = []
 for code, sym in TICKERS.items():
     try:
-        price, high = fetch(sym)
+        price, high, r20 = fetch(sym)
         dd = round((high - price) / high * 100, 1) if high else 0.0
         light = "green" if dd > 20 else ("yellow" if dd >= 10 else "red")
-        items[code] = {"price": price, "high": high, "dd": dd, "light": light}
+        items[code] = {"price": price, "high": high, "dd": dd, "light": light, "r20": r20}
     except Exception as e:
         fail.append(code)
 
-out = {"updated": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"), "items": items}
+# 相對強度：台股個股/ETF 比 0050、美股比 VOO
+bench_tw = items.get("0050", {}).get("r20")
+bench_us = items.get("VOO", {}).get("r20")
+for code, it in items.items():
+    bench = bench_tw if code[0].isdigit() else bench_us
+    if bench is not None:
+        it["rs"] = round(it["r20"] - bench, 1)  # >0 = 近月贏大盤(強勢/抗跌)
+
+out = {
+    "updated": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+    "bench": {"tw": bench_tw, "us": bench_us},
+    "items": items,
+}
 with open("data.json", "w", encoding="utf-8") as f:
     json.dump(out, f, ensure_ascii=False)
-print(f"OK: {len(items)} items, failed: {fail}")
+print(f"OK: {len(items)} items, failed: {fail}, bench tw={bench_tw} us={bench_us}")
