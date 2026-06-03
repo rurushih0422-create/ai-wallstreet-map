@@ -104,6 +104,18 @@
   .light-green{background:var(--green);box-shadow:0 0 8px var(--green)}
   .light-yellow{background:var(--yellow)}
   .light-red{background:var(--red);opacity:.5}
+  .etf-expandable{cursor:pointer}
+  .etf-expandable:hover{border-color:var(--blue)}
+  .exp-hint{font-size:11px;color:var(--blue);margin-left:8px;flex:0 0 auto;white-space:nowrap}
+  .etf-detail{background:#0d121c;border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:10px;padding:13px 15px;margin:2px 0 6px}
+  .ed-block{margin-bottom:11px}
+  .ed-h{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+  .ed-t{font-size:12.5px;color:var(--sub);line-height:1.55}
+  .ed-warn{background:linear-gradient(180deg,#241317,transparent);border-radius:8px;padding:9px 10px;border-left:3px solid var(--red)}
+  .ed-warn .ed-h{color:var(--red)}
+  .conc-bar{height:8px;background:#222b3a;border-radius:5px;overflow:hidden;margin:5px 0}
+  .conc-bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--yellow),var(--red))}
+  .ed-chart{margin:8px 0 4px}
 </style>
 </head>
 <body>
@@ -483,6 +495,69 @@ fetch('./data.json?_='+Date.now()).then(r=>r.json()).then(D=>{
   const u=document.getElementById('lightUpdated');
   if(u) u.textContent='🚦 回檔燈號更新：'+D.updated+'（每日自動）';
 }).catch(()=>{ const u=document.getElementById('lightUpdated'); if(u) u.textContent='🚦 回檔燈號：資料載入中或暫無'; });
+
+// ---- ETF 可展開卡片：四大核心分析 ----
+const ETF_DETAIL = {
+  "QQQ": {tv:"NASDAQ:QQQ", conc:65, concText:"前 10 大約 54%；前三大為輝達／蘋果／微軟。比 XLK 分散——還含電商（Amazon）、社群（Meta）、搜尋（Google）。",
+    beta:"1.27", maxdd:"2022 年約 −33%", fee:"0.20%", feeNote:"比 XLK／VGT 稍貴",
+    overlap:"跟 VOO、XLK、VGT 高度重疊（都重壓輝達／蘋果／微軟）。已持有大盤就別再大押同一批巨頭。"},
+  "XLK": {tv:"AMEX:XLK", conc:85, concText:"⚡ 蘋果＋微軟＋輝達 ≈ 40%、前 10 大 ≈ 57%——這不是分散的科技大盤，是一檔「三巨頭特調」。",
+    beta:"1.50", maxdd:"2022 年約 −31%", fee:"0.08%", feeNote:"超便宜，長期定期定額神兵",
+    overlap:"跟 QQQ／VGT 幾乎同一批股票。三者選一即可，別重複買。"},
+  "VGT": {tv:"AMEX:VGT", conc:80, concText:"325 檔看似分散，但「市值加權」→ 前 10 大 ≈ 60%，一樣蘋果／微軟／輝達主導。",
+    beta:"1.52", maxdd:"2022 年約 −30%", fee:"0.09%", feeNote:"超便宜",
+    overlap:"跟 XLK 幾乎一樣（XLK 更集中、VGT 檔數多一點）。二選一。"},
+  "SMH": {tv:"NASDAQ:SMH", conc:95, concText:"集中度全場最高——輝達＋台積電權重極大，僅約 25 檔、前 10 大 ≈ 70%。漲跌都最兇。",
+    beta:"約 1.4（最高）", maxdd:"2022 年約 −35% 以上", fee:"0.35%", feeNote:"半導體型合理",
+    overlap:"☢️ 跟 0050（台積電）、00911、費半 重疊核彈級。加它＝再押一次台積電＋輝達。"},
+  "IGV": {tv:"NASDAQ:IGV", conc:40, concText:"軟體／雲端，相對分散：最大 Palantir 8.8%、微軟 8.4%、甲骨文 8.2%，無單一 >10%。",
+    beta:"1.23", maxdd:"科技軟體 2022 重挫約 −35%", fee:"0.41%", feeNote:"主題型合理",
+    overlap:"✅ 跟硬體（SMH／台積電）重疊低——這是優點，幫你分散「只押晶片」的風險。AI 下半場。"},
+  "QTUM": {tv:"NASDAQ:QTUM", conc:15, concText:"80+ 檔「等權重」，最分散——單一股影響很小，但題材最早期、最投機。",
+    beta:"1.35–1.5（高）", maxdd:"量子題材波動極大", fee:"0.40%", feeNote:"主題型合理",
+    overlap:"等權重所以單一重疊低，但仍含半導體股。屬高波動衛星，小部位＋定期定額。"},
+  "00941": {tv:"TWSE:00941", conc:45, concText:"50 檔半導體「上游設備＋材料」：ASML（EUV 獨家）、東京威力、應材、信越。地區：美 48%／日 24%／荷 10%。",
+    beta:"設備材料波動大（資本支出循環）", maxdd:"循環性強、回檔可觀", fee:"官網為準", feeNote:"台股 ETF",
+    overlap:"⭐ 唯一避開 0050 重疊的半導體 ETF——買「幫台積電蓋廠、做原料」的，不買台積電／輝達本身。"}
+};
+function buildETFPanel(d){
+  const p=document.createElement('div'); p.className='etf-detail';
+  p.innerHTML =
+    '<div class="ed-block"><div class="ed-h">🔍 成分穿透（骨子裡裝什麼）</div>'+
+      '<div class="conc-bar"><span style="width:'+d.conc+'%"></span></div>'+
+      '<div class="ed-t">集中度 '+d.conc+'/100　'+d.concText+'</div></div>'+
+    '<div class="ed-block"><div class="ed-h">🌪️ 波動密碼（它的脾氣）</div>'+
+      '<div class="ed-t">Beta（波動度）：<b>'+d.beta+'</b>（>1 ＝ 比大盤兇）｜歷史最大回檔：<b>'+d.maxdd+'</b><br>買進前先有心理準備，遇回檔才不會恐慌賣。</div></div>'+
+    '<div class="ed-block"><div class="ed-h">💸 持有成本</div>'+
+      '<div class="ed-t">費用率 <b>'+d.fee+'</b>　'+d.feeNote+'</div></div>'+
+    '<div class="ed-block ed-warn"><div class="ed-h">⚠️ 重疊防禦提示</div>'+
+      '<div class="ed-t">'+d.overlap+'</div></div>'+
+    '<div class="ed-chart"></div>'+
+    '<a class="dtag" href="https://www.tradingview.com/chart/?symbol='+encodeURIComponent(d.tv)+'" target="_blank" rel="noopener" style="margin-left:0">📈 在 TradingView 看完整 K 線</a>';
+  // TradingView 迷你 K 線
+  const tv=document.createElement('div'); tv.className='tradingview-widget-container';
+  const tvw=document.createElement('div'); tvw.className='tradingview-widget-container__widget'; tv.appendChild(tvw);
+  const sc=document.createElement('script'); sc.type='text/javascript'; sc.async=true;
+  sc.src='https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+  sc.text=JSON.stringify({symbol:d.tv,width:'100%',height:180,locale:'zh_TW',dateRange:'12M',colorTheme:'dark',isTransparent:true,autosize:false});
+  tv.appendChild(sc);
+  p.querySelector('.ed-chart').appendChild(tv);
+  return p;
+}
+document.querySelectorAll('.etf').forEach(row=>{
+  const tname=(row.querySelector('.t')||{}).textContent||'';
+  let key=null;
+  for(const k in ETF_DETAIL){ if(tname.indexOf(k)>=0){ key=k; break; } }
+  if(!key) return;
+  row.classList.add('etf-expandable');
+  const hint=document.createElement('span'); hint.className='exp-hint'; hint.textContent='▾ 詳解'; row.appendChild(hint);
+  let panel=null;
+  row.addEventListener('click',function(e){
+    if(e.target.closest('a')) return;
+    if(panel){ panel.remove(); panel=null; hint.textContent='▾ 詳解'; return; }
+    panel=buildETFPanel(ETF_DETAIL[key]); row.after(panel); hint.textContent='▴ 收合';
+  });
+});
 </script>
 </body>
 </html>
