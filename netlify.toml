@@ -1,0 +1,5 @@
+# 讓 HTML 每次都重新驗證，更新後立刻看到（避免瀏覽器快取舊版）
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

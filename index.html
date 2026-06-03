@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 AI 列車 × 蛋糕｜全景思考地圖</title>
+<style>
+  :root{
+    --bg:#0b0e14; --panel:#141925; --panel2:#1b2230; --line:#2a3344;
+    --ink:#e8edf6; --sub:#9aa7bd; --muted:#6b7689;
+    --green:#28c787; --yellow:#f2c14e; --red:#ef5e6b;
+    --blue:#4f9cf2; --gold:#d8b36a;
+    --shadow:0 6px 22px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:radial-gradient(1200px 600px at 50% -10%,#16203a 0,var(--bg) 55%);
+    color:var(--ink); font-family:-apple-system,"PingFang TC","Noto Sans TC","Segoe UI",system-ui,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px; margin:0 auto; padding:0 18px 80px}
+  header.hero{padding:48px 18px 22px; text-align:center}
+  header.hero h1{font-size:30px; margin:0 0 8px; letter-spacing:.5px}
+  header.hero p{color:var(--sub); margin:4px 0; font-size:14px}
+  .tag-disclaim{display:inline-block; margin-top:10px; font-size:12px; color:var(--muted); border:1px solid var(--line); padding:4px 12px; border-radius:999px}
+
+  /* sticky nav + legend */
+  .bar{position:sticky; top:0; z-index:40; background:rgba(11,14,20,.86); backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
+  .bar-in{max-width:1080px; margin:0 auto; padding:10px 18px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center}
+  .navbtn{cursor:pointer; border:1px solid var(--line); background:var(--panel); color:var(--ink); padding:7px 14px; border-radius:999px; font-size:13px; transition:.15s}
+  .navbtn:hover{border-color:var(--blue); color:#fff}
+  .navbtn.on{background:var(--blue); border-color:var(--blue); color:#fff}
+  .legend{display:flex; flex-wrap:wrap; gap:14px; justify-content:center; padding:10px 18px 2px; font-size:12px; color:var(--sub)}
+  .legend b{color:var(--ink); font-weight:600}
+  .dot{display:inline-block; width:9px;height:9px;border-radius:50%; vertical-align:middle; margin-right:4px}
+  .dot.g{background:var(--green)} .dot.y{background:var(--yellow)} .dot.r{background:var(--red)}
+  .ring{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:middle;margin-right:4px;border:2px solid}
+  .ring.big{background:#cfd8e8;border-color:#cfd8e8} .ring.mid{border-color:var(--blue)} .ring.small{border-color:var(--gold)}
+
+  section{margin-top:40px}
+  .sec-head{display:flex; align-items:center; gap:10px; margin-bottom:6px}
+  .sec-head h2{font-size:22px; margin:0}
+  .sec-head .sub{color:var(--sub); font-size:13px}
+  .sec-desc{color:var(--sub); font-size:14px; margin:0 0 18px}
+
+  /* TRAIN */
+  .engine{background:linear-gradient(135deg,#27406e,#16203a); border:1px solid #35507f; border-radius:16px; padding:16px 18px; text-align:center; margin-bottom:6px; box-shadow:var(--shadow)}
+  .engine .lab{font-size:12px; color:#9fc0ff; letter-spacing:2px}
+  .engine .big{font-size:18px; font-weight:700; margin-top:2px}
+  .engine .small{font-size:12.5px; color:var(--sub); margin-top:4px}
+  .rail{position:relative; margin-left:20px; border-left:2px dashed var(--line); padding-left:22px}
+  .car{position:relative; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin:14px 0; box-shadow:var(--shadow); transition:.15s}
+  .car:hover{border-color:var(--blue); transform:translateX(2px)}
+  .car::before{content:""; position:absolute; left:-31px; top:22px; width:14px;height:14px;border-radius:50%; background:var(--panel2); border:2px solid var(--blue)}
+  .car.gap{border-style:dashed; border-color:#5a4a2a; background:linear-gradient(180deg,#1c1a12,var(--panel))}
+  .car.gap::after{content:"易被忽略"; position:absolute; right:14px; top:12px; font-size:11px; color:var(--yellow); border:1px solid #5a4a2a; padding:2px 8px; border-radius:999px}
+  .car .num{display:inline-flex; width:26px;height:26px; border-radius:8px; background:var(--panel2); color:var(--blue); font-weight:700; align-items:center; justify-content:center; font-size:13px; margin-right:8px}
+  .car h3{display:inline; font-size:16.5px; margin:0}
+  .car .role{color:var(--sub); font-size:13px; margin:6px 0 10px}
+  .chips{display:flex; flex-wrap:wrap; gap:7px}
+  .chip{display:inline-flex; align-items:center; gap:5px; background:var(--panel2); border:1px solid var(--line); border-radius:999px; padding:4px 10px; font-size:12.5px}
+  .chip .code{color:var(--muted); font-size:11px}
+  .chip.done{box-shadow:inset 0 0 0 1px rgba(40,199,135,.35)}
+  .chip .check{color:var(--green); font-weight:700}
+
+  /* CAKE */
+  .cakeArt{display:flex; flex-direction:column; align-items:center; gap:3px; margin:0 auto 20px; width:min(360px,90%)}
+  .slab{width:100%; border-radius:10px; padding:6px; text-align:center; font-size:12px; color:#0b0e14; font-weight:700}
+  .slab.t{background:linear-gradient(90deg,#ef5e6b,#f2849a); width:62%}
+  .slab.m{background:linear-gradient(90deg,#f2c14e,#f7d98a); width:82%}
+  .slab.b{background:linear-gradient(90deg,#28c787,#73e0b4); width:100%}
+  .layer{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; margin:14px 0; box-shadow:var(--shadow); border-left:5px solid}
+  .layer.b{border-left-color:var(--green)} .layer.m{border-left-color:var(--yellow)} .layer.t{border-left-color:var(--red)}
+  .layer h3{margin:0 0 4px; font-size:17px}
+  .layer .meta{font-size:12.5px; color:var(--sub); margin-bottom:10px}
+  .layer .how{margin-top:10px; font-size:13px; color:var(--sub); background:var(--panel2); border-radius:10px; padding:8px 12px}
+  .layer .how b{color:var(--ink)}
+
+  /* MONITOR */
+  .mon{display:grid; grid-template-columns:1fr; gap:12px}
+  @media(min-width:680px){.mon{grid-template-columns:1fr 1fr 1fr}}
+  .alert{background:linear-gradient(180deg,#241318,#141925); border:1px solid #4a2730; border-radius:14px; padding:16px}
+  .alert .ic{font-size:22px} .alert h4{margin:6px 0 4px; font-size:15px}
+  .alert p{margin:0; font-size:13px; color:var(--sub)}
+
+  .hideStatus-y [data-st="y"], .hideStatus-r [data-st="r"]{display:none}
+  .onlyDone .chip:not(.done){display:none}
+  footer{margin-top:50px; text-align:center; color:var(--muted); font-size:12px; border-top:1px solid var(--line); padding-top:20px}
+  .pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--sub);margin-left:6px}
+  .etfgrid{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .etf{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+  .etf .t{font-weight:700;font-size:14.5px}
+  .etf .mk{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:0 6px}
+  .etf .fee{font-size:11.5px;color:var(--sub);margin-left:auto;white-space:nowrap}
+  .etf .desc{flex-basis:100%;font-size:12.5px;color:var(--sub)}
+  .etf.star{border-color:var(--gold);box-shadow:inset 0 0 0 1px rgba(216,179,106,.3)}
+  .etf.done2{box-shadow:inset 0 0 0 1px rgba(40,199,135,.35)}
+  .callout{margin-top:12px;font-size:13px;color:var(--ink);background:linear-gradient(180deg,#1d2417,var(--panel2));border:1px solid #3a5a2a;border-left:4px solid var(--gold);border-radius:10px;padding:11px 13px}
+  .callout b{color:var(--gold)}
+  .dtag{display:inline-block;font-size:11px;color:#7fb2f7;border:1px solid #2f4d72;border-radius:5px;padding:1px 7px;margin-left:7px;text-decoration:none;white-space:nowrap}
+  .dtag:hover{background:#1b2740;color:#fff;border-color:var(--blue)}
+  .light{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;flex:0 0 auto;cursor:help}
+  .light-green{background:var(--green);box-shadow:0 0 8px var(--green)}
+  .light-yellow{background:var(--yellow)}
+  .light-red{background:var(--red);opacity:.5}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>🚂 2026 AI 列車 × 🍰 蛋糕</h1>
+  <p>全景思考地圖｜整理：AI華爾街白話文｜2026-06-03</p>
+  <p>橫向看「<b style="color:#fff">有哪些標的</b>」＝列車　·　縱向看「<b style="color:#fff">該擺哪一層、先研究誰</b>」＝蛋糕</p>
+  <span class="tag-disclaim">思考用地圖，非推薦清單。每檔進場前請跑六面查證。非投資建議。</span>
+</header>
+
+<div class="bar">
+  <div class="bar-in">
+    <a class="navbtn on" href="#train">🚂 列車（環節）</a>
+    <a class="navbtn" href="#cake">🍰 蛋糕（配置）</a>
+    <a class="navbtn" href="#monitor">🛑 出軌監測</a>
+    <a class="navbtn" href="#etf">💰 ETF</a>
+    <a class="navbtn" href="#mood">🌡️ 進場溫度</a>
+    <span style="width:1px;height:20px;background:var(--line);margin:0 4px"></span>
+    <button class="navbtn" id="fAll">顯示全部</button>
+    <button class="navbtn" id="fGreen">只看 🟢 已兌現</button>
+    <button class="navbtn" id="fDone">只看 ✓ 已做功課</button>
+  </div>
+  <div class="legend">
+    <span><b>狀態</b></span>
+    <span><span class="dot g"></span>已兌現</span>
+    <span><span class="dot y"></span>兌現中</span>
+    <span><span class="dot r"></span>想像(2027+)</span>
+    <span style="opacity:.4">｜</span>
+    <span><b>體質</b></span>
+    <span><span class="ring big"></span>大型權值</span>
+    <span><span class="ring mid"></span>中型成長</span>
+    <span><span class="ring small"></span>中小飆股</span>
+    <span style="opacity:.4">｜</span>
+    <span><span class="check" style="color:var(--green);font-weight:700">✓</span> = 已做完整六面報告</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- TRAIN -->
+  <section id="train">
+    <div class="sec-head"><h2>🚂 列車</h2><span class="sub">從需求源頭 → 實體堆疊，十節車廂</span></div>
+    <p class="sec-desc">火車頭是「美股 AI 資本支出」。所有車廂共用這個引擎——引擎熄火，全列車一起回檔（見最後出軌監測）。</p>
+
+    <div class="engine">
+      <div class="lab">🚂 火車頭（需求源頭）</div>
+      <div class="big">美股 AI 資本支出</div>
+      <div class="small">NVIDIA／雲端巨頭（Google、微軟、Amazon、Meta）的資料中心投資</div>
+    </div>
+
+    <div class="rail" id="rail"></div>
+  </section>
+
+  <!-- CAKE -->
+  <section id="cake">
+    <div class="sec-head"><h2>🍰 蛋糕</h2><span class="sub">同樣這些標的，按「在你資產裡的角色」分三層</span></div>
+    <p class="sec-desc">越下層越穩、越上層越投機。決定你怎麼配置、先研究誰。</p>
+
+    <div class="cakeArt">
+      <div class="slab t">🟥 頂層 · 題材飆股（糖霜）</div>
+      <div class="slab m">🟨 中層 · 成長兌現中</div>
+      <div class="slab b">🟫 地基 · 核心權值</div>
+    </div>
+
+    <div class="layer b">
+      <h3>🟫 地基層 · 核心權值</h3>
+      <div class="meta">大到不會倒、法人認養、財報真兌現 — 你的壓艙石</div>
+      <div class="chips">
+        <span class="chip done"><span class="ring big"></span>台積電<span class="code">2330</span><span class="check">✓</span></span>
+        <span class="chip done"><span class="ring big"></span>鴻海<span class="code">2317</span><span class="check">✓</span></span>
+        <span class="chip"><span class="ring big"></span>台達電<span class="code">2308</span></span>
+        <span class="chip"><span class="ring big"></span>廣達<span class="code">2382</span></span>
+        <span class="chip done"><span class="ring big"></span>Google<span class="code">美股</span><span class="check">✓</span></span>
+      </div>
+      <div class="how"><b>怎麼操作：</b>核心持有，回檔分批，不追高。</div>
+    </div>
+
+    <div class="layer m">
+      <h3>🟨 中層 · 成長兌現中</h3>
+      <div class="meta">財報正在噴、題材已兌現，但波動比權值大 — 主升段的肉</div>
+      <div class="chips">
+        <span class="chip done"><span class="ring mid"></span>奇鋐<span class="code">3017</span><span class="check">✓</span></span>
+        <span class="chip done"><span class="ring mid"></span>威剛<span class="code">3260</span><span class="check">✓</span></span>
+        <span class="chip"><span class="ring mid"></span>十銓<span class="code">4967</span></span>
+        <span class="chip"><span class="ring mid"></span>雙鴻<span class="code">3324</span></span>
+        <span class="chip"><span class="ring mid"></span>智邦<span class="code">2345</span></span>
+        <span class="chip done"><span class="ring mid"></span>欣興<span class="code">3037</span><span class="check">✓</span></span>
+        <span class="chip"><span class="ring mid"></span>華城<span class="code">1519</span></span>
+        <span class="chip done"><span class="ring mid"></span>技嘉<span class="code">2376</span><span class="check">✓</span></span>
+      </div>
+      <div class="how"><b>怎麼操作：</b>順勢參與，跌破關鍵均線就減；別用「便宜」當長抱理由（尤其循環股如威剛）。</div>
+    </div>
+
+    <div class="layer t">
+      <h3>🟥 頂層 · 題材飆股</h3>
+      <div class="meta">彈性最大、籌碼最淺、最容易「拋物線＋當沖賭場」 — 糖霜，好看別吃太多</div>
+      <div class="chips">
+        <span class="chip done"><span class="ring small"></span>盟立<span class="code">2464</span><span class="check">✓</span></span>
+        <span class="chip done"><span class="ring small"></span>國巨<span class="code">2327</span><span class="check">✓</span></span>
+        <span class="chip done"><span class="ring small"></span>微星<span class="code">2377</span><span class="check">✓</span></span>
+        <span class="chip done"><span class="ring small"></span>群創<span class="code">3481</span><span class="check">✓</span></span>
+        <span class="chip"><span class="ring small"></span>鈦昇<span class="code">8027</span></span>
+        <span class="chip"><span class="ring small"></span>山太士<span class="code">3595</span></span>
+        <span class="chip"><span class="ring small"></span>新盛力<span class="code">4931</span></span>
+        <span class="chip"><span class="ring small"></span>聯亞<span class="code">3081</span></span>
+      </div>
+      <div class="how"><b>怎麼操作：</b>總部位設上限（例如 ≤15–20%）、單檔設停損；2027 才量產的（🔴）只能小賭未來、不能重押。</div>
+    </div>
+  </section>
+
+  <!-- MONITOR -->
+  <section id="monitor">
+    <div class="sec-head"><h2>🛑 出軌監測層</h2><span class="sub">整列車共用的三個命門</span></div>
+    <p class="sec-desc">整條 AI 列車其實是「同一個故事」，所以也會「一起出軌」。任何一個訊號轉向，就全車減碼。</p>
+    <div class="mon">
+      <div class="alert"><div class="ic">🚂</div><h4>引擎：AI capex</h4><p>NVIDIA／雲端巨頭的資本支出指引有沒有轉弱？火車頭熄火＝全列回檔。</p></div>
+      <div class="alert"><div class="ic">🌡️</div><h4>溫度計：記憶體報價</h4><p>DRAM/NAND 報價有沒有見頂？這是循環溫度計，也是威剛那節的命門。</p></div>
+      <div class="alert"><div class="ic">💰</div><h4>籌碼：主動式 ETF</h4><p>00988A／00981A 等規模與申贖有沒有反轉？抱團助漲、贖回踩踏。</p></div>
+    </div>
+  </section>
+
+  <!-- ETF -->
+  <section id="etf">
+    <div class="sec-head"><h2>💰 ETF 地圖</h2><span class="sub">進攻（科技/題材）＋ 避險（現金/黃金）</span></div>
+    <p class="sec-desc">用一籃子賭一個趨勢，比賭單一公司安全。越窄的題材費用越高、波動越大 → 小部位＋定期定額。核心永遠是低費用大盤。（美股費用率為查證值，台股標「官網為準」。）</p>
+
+    <div class="layer b">
+      <h3>🟩 第一層 · 科技大盤（最穩的衛星）</h3>
+      <div class="etfgrid">
+        <div class="etf"><span class="t">QQQ</span><span class="mk">美</span><span class="fee">費 0.20%</span><span class="desc">那斯達克 100（科技＋成長龍頭）· 最主流科技大盤</span></div>
+        <div class="etf"><span class="t">XLK</span><span class="mk">美</span><span class="fee">費 0.08%</span><span class="desc">標普科技類股（74 檔）· 純美國大型科技、超便宜</span></div>
+        <div class="etf"><span class="t">VGT</span><span class="mk">美</span><span class="fee">費 0.09%</span><span class="desc">全美科技（325 檔）· 最分散、便宜</span></div>
+        <div class="etf"><span class="t">IYW</span><span class="mk">美</span><span class="fee">費 ~0.39%</span><span class="desc">⚠️ 跟 XLK/VGT 同類但貴 4–5 倍、更集中（NVIDIA 17%／Apple 14%），重複性高</span></div>
+        <div class="etf"><span class="t">00757</span><span class="mk">台</span><span class="fee">官網為準</span><span class="desc">NYSE FANG+（10 檔美國巨頭）· 台幣買龍頭、但超集中</span></div>
+      </div>
+    </div>
+
+    <div class="layer m">
+      <h3>🟨 第二層 · 半導體（AI 列車的「① 算力核心」）</h3>
+      <div class="etfgrid">
+        <div class="etf"><span class="t">SMH</span><span class="mk">美</span><span class="fee">費 0.35%</span><span class="desc">VanEck 半導體（約 25 檔，前幾大很重）· 最主流最集中</span></div>
+        <div class="etf"><span class="t">SOXX</span><span class="mk">美</span><span class="fee">費 0.35%</span><span class="desc">iShares 半導體（約 30 檔）· SMH 的略分散版</span></div>
+        <div class="etf"><span class="t">00830</span><span class="mk">台</span><span class="fee">官網為準</span><span class="desc">直接追費城半導體指數（SOX）· 台幣買費半最直接</span></div>
+        <div class="etf"><span class="t">00891</span><span class="mk">台</span><span class="fee">官網為準</span><span class="desc">台股為主的關鍵半導體</span></div>
+        <div class="etf"><span class="t">00911</span><span class="mk">台</span><span class="fee">官網為準</span><span class="desc">⚠️ ICE 半導體指數（＝SOXX 同款）· 台幣版 SOXX、跟費半/0050 高度重疊</span></div>
+        <div class="etf star"><span class="t">00941 ⭐</span><span class="mk">台</span><span class="fee">官網為準</span><span class="desc">半導體上游「設備與材料」（ASML、東京威力、信越）· 不買台積電/輝達</span></div>
+      </div>
+      <div class="callout">⭐ <b>00941 的亮點：</b>半導體這層大家都搶台積電/輝達。怕它們太貴、又不想跟 0050 重複——00941 是唯一去買「<b>幫台積電蓋工廠、做原料</b>」的設備材料 ETF，有效避開重疊陷阱！代價是設備材料屬資本支出循環、波動大，一樣小部位＋定期定額。</div>
+    </div>
+
+    <div class="layer t">
+      <h3>🟥 第三層 · AI／軟體／機器人（硬體鋪完，下半場換軟體）</h3>
+      <div class="etfgrid">
+        <div class="etf star"><span class="t">IGV ⭐</span><span class="mk">美</span><span class="fee">費 ~0.41%</span><span class="desc">擴展科技軟體＋雲端（微軟、Salesforce、Oracle、Adobe）· AI 下半場</span></div>
+        <div class="etf"><span class="t">AIQ</span><span class="mk">美</span><span class="fee">費 ~0.68%</span><span class="desc">Global X 人工智慧與科技 · AI 軟硬通吃</span></div>
+        <div class="etf"><span class="t">BOTZ</span><span class="mk">美</span><span class="fee">費 0.68%</span><span class="desc">Global X 機器人與 AI · 機器人＋自動化</span></div>
+      </div>
+      <div class="callout">⭐ <b>IGV 的亮點：</b>現在 AI 都在炒<b>硬體</b>（輝達/台積電）。但硬體鋪完，下一棒是<b>軟體</b>——IGV 是美股最強純軟體/雲端 ETF。<b>不想只賭晶片、想布局「下半場 AI 軟體商機」的人，IGV 是最佳解。</b></div>
+    </div>
+
+    <div class="layer t">
+      <h3>🟥 第四層 · 利基題材（高波動，糖霜中的糖霜）</h3>
+      <div class="etfgrid">
+        <div class="etf done2"><span class="t">QTUM ✓</span><span class="mk">美</span><a class="dtag" href="https://vocus.cc/article/6a1fc604fd89780001f92615" target="_blank" rel="noopener">📰 06/03 六面</a><span class="fee">費 0.40%</span><span class="desc">量子運算＋機器學習（80+ 檔）· 已做完整六面</span></div>
+        <div class="etf"><span class="t">CIBR</span><span class="mk">美</span><span class="fee">費 ~0.59%</span><span class="desc">網路安全（CrowdStrike／Palo Alto／Fortinet）</span></div>
+        <div class="etf"><span class="t">ARKX／UFO</span><span class="mk">美</span><span class="fee">費 ~0.5–0.75%</span><span class="desc">太空經濟（搭 SpaceX 題材）</span></div>
+        <div class="etf"><span class="t">比特幣 IBIT</span><span class="mk">美</span><span class="fee">費 ~0.25%</span><span class="desc">🔴 現貨比特幣 · 高波動進攻題材（崩盤跌更兇、<b style="color:var(--red)">非避險</b>）· 小部位、要能接受腰斬</span></div>
+      </div>
+    </div>
+
+    <div class="callout" style="border-left-color:var(--red);border-color:#5a2730;background:linear-gradient(180deg,#241317,var(--panel2))">
+      ⚠️ <b style="color:var(--red)">重疊陷阱（最重要）：</b>這些半導體/科技 ETF 骨子裡常是「同一批股票」。0050 一半是台積電、QQQ/SMH/00830 都重壓 NVIDIA＋台積電。<b style="color:var(--red)">全買 ＝ 把台積電＋輝達押了好幾遍</b>，回檔時一起痛。每加一檔先問：跟我已有的重不重複？想避開 → 看 00941（設備材料）或 IGV（軟體）。
+    </div>
+
+    <div class="callout" style="border-left-color:var(--muted);border-color:var(--line);background:var(--panel2)">
+      📝 <b style="color:var(--sub)">刻意不放：</b>00946（群益科技高息成長）、00927（群益半導體收益）是「科技＋配息」混血。本圖專做「純成長/題材」，配息型不混進來保持乾淨——想領息的人再單獨研究（高股息長期通常輸純成長）。
+    </div>
+
+    <div class="sec-head" style="margin-top:40px"><h2>🛡️ 避險層</h2><span class="sub">崩盤時撐住你的子彈 · 跟股票低相關</span></div>
+    <p class="sec-desc">避險的功能是「<b>心理 ＞ 報酬</b>」——讓你崩盤時抱得住、不恐慌殺低。年輕、長期、有現金流的人放少一點（約 10–20%）即可，別拖累成長。</p>
+
+    <div class="layer b">
+      <h3>🟫 真避險（崩盤時撐住／逆勢）</h3>
+      <div class="etfgrid">
+        <div class="etf"><span class="t">現金 / SGOV</span><span class="mk">美</span><span class="fee">費 ~0.09%</span><span class="desc">最純的子彈——幾乎不跌、領無風險利息，崩盤直接買</span></div>
+        <div class="etf star"><span class="t">IAU ⭐</span><span class="mk">美</span><span class="fee">費 0.25%</span><span class="desc">黃金（便宜版）· 危機保險＋抗通膨、跟股票低相關</span></div>
+        <div class="etf"><span class="t">GLD</span><span class="mk">美</span><span class="fee">費 0.40%</span><span class="desc">黃金（規模最大）</span></div>
+        <div class="etf"><span class="t">00635U</span><span class="mk">台</span><span class="fee">官網為準</span><span class="desc">台股黃金（期貨型，有轉倉成本、純度差一點）</span></div>
+      </div>
+      <div class="callout">⭐ <b>你的避險策略（年輕＋有現金流）：</b>其實只需要「<b>現金 ＋ 黃金</b>」兩樣——平常擺著，崩盤時賣黃金/動用現金加碼股票。<b>不需要公債</b>（那是給靠投資領錢、受不了波動的人用的）。</div>
+    </div>
+
+    <div class="layer t">
+      <h3>⚠️ 這些「不是避險」（別搞混）</h3>
+      <div class="etfgrid">
+        <div class="etf"><span class="t">比特幣 IBIT</span><span class="mk">美</span><span class="desc">🔴 高波動「進攻題材」，崩盤時跌更兇——不是數位黃金、<b style="color:var(--red)">不能當避險</b>（它在進攻層）</span></div>
+        <div class="etf"><span class="t">穩定幣</span><span class="mk">幣</span><span class="desc">🟡「有風險的現金」——會脫鉤、無保障，要安全子彈用現金/SGOV 更好</span></div>
+        <div class="etf"><span class="t">反向 ETF / VIX</span><span class="mk">美/台</span><span class="desc">只能短打，長抱會耗損歸零</span></div>
+        <div class="etf"><span class="t">高股息</span><span class="mk">台/美</span><span class="desc">還是股票，崩盤照跌——不是避險</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MOOD / 進場溫度 -->
+  <section id="mood">
+    <div class="sec-head"><h2>🌡️ 進場溫度</h2><span class="sub">恐慌貪婪 ＋ 回檔燈號 · 幫你判斷「什麼時候買」</span></div>
+    <p class="sec-desc">地圖告訴你「<b>買什麼</b>」，這頁告訴你「<b>什麼時候買</b>」——別人貪婪我恐懼。（V1：情緒看即時、回檔對照規則自己看；V2 會自動幫每張卡片亮燈。）</p>
+
+    <div class="layer b">
+      <h3>📈 即時行情（TradingView）</h3>
+      <div class="tradingview-widget-container" style="margin-top:8px">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+        {"symbols":[{"proName":"TVC:VIX","title":"VIX 恐慌"},{"proName":"NASDAQ:QQQ","title":"QQQ"},{"proName":"NASDAQ:SMH","title":"SMH 半導體"},{"proName":"NASDAQ:QTUM","title":"QTUM 量子"},{"proName":"TWSE:2330","title":"台積電"},{"proName":"TWSE:0050","title":"0050"},{"proName":"BITSTAMP:BTCUSD","title":"比特幣"}],"showSymbolLogo":true,"colorTheme":"dark","isTransparent":true,"displayMode":"adaptive","locale":"zh_TW"}
+        </script>
+      </div>
+      <div class="sec-desc" style="margin-top:6px;font-size:12px">若有符號顯示不出來，跟我說，我換代碼。想看單檔 K 線，到「列車」分頁點股票或自行在 TradingView 搜尋。</div>
+    </div>
+
+    <div class="layer m">
+      <h3>😱 市場恐慌貪婪（每天看一次就夠）</h3>
+      <div class="etfgrid">
+        <div class="etf"><span class="t">VIX 恐慌指數</span><span class="desc">&gt;30 ＝ 恐慌（別人怕，找機會）｜15–30 中性｜&lt;15 ＝ 自滿（小心追高）</span></div>
+        <div class="etf"><span class="t">CNN 恐懼與貪婪</span><span class="desc">0–100。&lt;25 極度恐懼（貪婪的時機）｜&gt;75 極度貪婪（別追）</span></div>
+      </div>
+      <div class="callout"><a class="dtag" href="https://edition.cnn.com/markets/fear-and-greed" target="_blank" rel="noopener" style="font-size:13px;margin-left:0">🔗 點我看 CNN 恐懼與貪婪指數</a> ｜ VIX 即時數字在上面的行情列。</div>
+    </div>
+
+    <div class="layer t">
+      <h3>🚦 回檔燈號規則（基準：距「52 週最高點」的跌幅）</h3>
+      <div class="etfgrid">
+        <div class="etf"><span class="t">🔴 紅燈 · 回檔 &lt; 10%</span><span class="desc">還貼在高點，偏貴、別追高</span></div>
+        <div class="etf"><span class="t">🟡 黃燈 · 回檔 10–20%</span><span class="desc">進入觀察區，開始留意</span></div>
+        <div class="etf star"><span class="t">🟢 綠燈 · 回檔 &gt; 20%</span><span class="desc">⭐ 相對便宜，可考慮分批（你最在意的撿便宜訊號）</span></div>
+      </div>
+      <div class="callout">⭐ <b>用法：</b>燈號<b>已自動上線</b>——「列車 / 蛋糕 / ETF」各分頁的標的前面會出現小圓點：🟢 可分批 / 🟡 觀察 / 🔴 偏高。滑鼠移上去看回檔 %。<br>⚠️ <b style="color:var(--red)">重要：</b>回檔深也可能是「基本面變壞」（接刀），綠燈要搭配六面分析一起看，不是跌深就買。</div>
+      <div class="sec-desc" id="lightUpdated" style="margin-top:8px">🚦 回檔燈號載入中…</div>
+    </div>
+  </section>
+
+  <footer>
+    本圖為產業結構整理與個人思考框架，標的僅為各環節代表、非推薦；個股代號與角色屬一般認知，買前請自行查證最新財報與籌碼。非投資建議。<br>
+    AI華爾街白話文· 2026-06-03
+  </footer>
+</div>
+
+<script>
+// ---- Train data ----
+const cars = [
+  {n:"①",name:"算力核心",role:"晶圓代工＋ASIC 設計，整列火車頭",gap:false,
+   stocks:[["台積電","2330","g","big",true],["世芯-KY","3661","g","mid",false],["創意","3443","g","mid",false]]},
+  {n:"②",name:"算力系統",role:"把晶片組成 AI 伺服器／機櫃",gap:false,
+   stocks:[["鴻海","2317","g","big",true],["廣達","2382","g","big",false],["緯穎","6669","g","mid",false],["緯創","3231","g","mid",false]]},
+  {n:"③",name:"先進封裝",role:"CoWoS→CoPoS、玻璃基板/TGV（設備/檢測供應鏈最完整的一環）",gap:false,
+   stocks:[["鈦昇","8027","r","small",false],["辛耘","3583","y","small",false],["蔚華科","3055","r","small",false],["山太士","3595","r","small",false],["德律","3030","y","mid",false],["致茂","2360","g","mid",false],["弘塑","3131","y","mid",false]]},
+  {n:"④",name:"記憶體",role:"HBM 排擠 → DRAM/NAND 超級循環",gap:true,
+   stocks:[["威剛","3260","g","mid",true],["十銓","4967","g","mid",false],["群聯","8299","g","mid",false],["南亞科","2408","g","mid",false],["華邦電","2344","g","mid",false],["京元電","6451","g","mid",false]]},
+  {n:"⑤",name:"載板",role:"承載晶片的高階基板（ABF／玻璃）",gap:false,
+   stocks:[["欣興","3037","y","mid",true],["南電","8046","y","mid",false],["景碩","3189","y","mid",false],["鑫科","3663","r","small",false]]},
+  {n:"⑥",name:"電力",role:"資料中心吃電怪獸：BBU／HVDC／重電",gap:false,
+   stocks:[["台達電","2308","g","big",false],["光寶科","2301","g","mid",false],["順達","3211","y","small",false],["新盛力","4931","y","small",false],["AES-KY","6781","y","small",false],["華城","1519","g","mid",false],["士電","1503","g","mid",false],["中興電","1513","g","mid",false]]},
+  {n:"⑦",name:"散熱（液冷）",role:"氣冷 → 液冷是確定趨勢",gap:true,
+   stocks:[["奇鋐","3017","g","mid",true],["雙鴻","3324","g","mid",false],["高力","8996","g","small",false],["建準","2421","g","mid",false]]},
+  {n:"⑧",name:"光通訊／連接",role:"CPO 矽光子＋銅纜＋高速交換器",gap:true,
+   stocks:[["聯亞","3081","r","small",false],["上詮","3363","y","small",false],["華星光","4979","r","small",false],["嘉澤","3533","g","mid",false],["貿聯-KY","3665","g","mid",false],["智邦","2345","g","mid",false]]},
+  {n:"⑨",name:"高速 PCB／材料",role:"高速訊號的板子與銅箔基板",gap:false,
+   stocks:[["金像電","2368","g","mid",false],["台光電","2383","g","mid",false],["聯茂","6213","g","mid",false]]},
+  {n:"⑩",name:"被動元件",role:"AI 伺服器用大量高階電源/訊號元件",gap:false,
+   stocks:[["國巨","2327","g","mid",true],["華新科","2492","g","small",false],["禾伸堂","3026","g","small",false]]},
+];
+const rail = document.getElementById("rail");
+cars.forEach(c=>{
+  const chips = c.stocks.map(s=>{
+    const [name,code,st,size,done]=s;
+    return `<span class="chip ${done?'done':''}" data-st="${st}">
+      <span class="ring ${size}"></span>${name}<span class="code">${code}</span>${done?'<span class="check">✓</span>':''}</span>`;
+  }).join("");
+  rail.insertAdjacentHTML("beforeend",
+    `<div class="car ${c.gap?'gap':''}">
+       <span class="num">${c.n}</span><h3>${c.name}</h3>
+       <div class="role">${c.role}</div>
+       <div class="chips">${chips}</div>
+     </div>`);
+});
+
+// robot adjacent train note
+rail.insertAdjacentHTML("beforeend",
+  `<div class="car" style="border-color:#3a2e52;background:linear-gradient(180deg,#191329,var(--panel))">
+     <span class="num" style="color:#b794f6">🤖</span><h3>延伸：另一列車 — 人形機器人／具身智慧</h3>
+     <div class="role">獨立題材，別跟「AI 資料中心」列車混算</div>
+     <div class="chips">
+       <span class="chip done" data-st="r"><span class="ring small"></span>盟立<span class="code">2464</span><span class="check">✓</span></span>
+       <span class="chip" data-st="y"><span class="ring mid"></span>上銀<span class="code">2049</span></span>
+       <span class="chip" data-st="y"><span class="ring small"></span>廣明<span class="code">6188</span></span>
+     </div>
+   </div>`);
+
+// quantum adjacent train
+rail.insertAdjacentHTML("beforeend",
+  `<div class="car" style="border-color:#1f4d52;background:linear-gradient(180deg,#0e2226,var(--panel))">
+     <span class="num" style="color:#4fd1d9">⚛️</span><h3>延伸：另一列車 — 量子運算（最早期，2030+ 才商用）</h3>
+     <div class="role">幾乎整條都在 🔴 想像端、本夢比之王；純股多在美股，只能「小部位賭未來」。想分散就用 ETF。</div>
+     <div class="chips">
+       <span class="chip done" data-st="r"><span class="ring small"></span>Infleqtion<span class="code">INFQ·美·國家隊</span><span class="check">✓</span></span>
+       <span class="chip" data-st="r"><span class="ring small"></span>IonQ<span class="code">IONQ·美</span></span>
+       <span class="chip" data-st="r"><span class="ring small"></span>Rigetti<span class="code">RGTI·美</span></span>
+       <span class="chip" data-st="r"><span class="ring small"></span>D-Wave<span class="code">QBTS·美</span></span>
+       <span class="chip" data-st="g"><span class="ring big"></span>Google／IBM<span class="code">大廠順便做·不純</span></span>
+       <span class="chip" data-st="y"><span class="ring mid"></span>QTUM<span class="code">量子ETF·分散較穩</span></span>
+     </div>
+   </div>`);
+
+// ---- nav active on scroll ----
+const navs=[...document.querySelectorAll('.bar-in a.navbtn')];
+const secs=navs.map(a=>document.querySelector(a.getAttribute('href')));
+addEventListener('scroll',()=>{
+  let i=secs.length-1; for(;i>0;i--){if(secs[i].getBoundingClientRect().top<160)break;}
+  navs.forEach(n=>n.classList.remove('on')); navs[i].classList.add('on');
+});
+
+// ---- filters ----
+const body=document.body;
+function clearF(){body.classList.remove('hideStatus-y','hideStatus-r','onlyDone');
+  document.querySelectorAll('#fAll,#fGreen,#fDone').forEach(b=>b.classList.remove('on'));}
+document.getElementById('fAll').onclick=e=>{clearF();e.target.classList.add('on');};
+document.getElementById('fGreen').onclick=e=>{clearF();body.classList.add('hideStatus-y','hideStatus-r');e.target.classList.add('on');};
+document.getElementById('fDone').onclick=e=>{clearF();body.classList.add('onlyDone');e.target.classList.add('on');};
+document.getElementById('fAll').classList.add('on');
+
+// ---- 方格子文章連結：代號 → 網址，自動掃描所有股票標籤接上 ----
+const ARTICLES = {
+  "2330":"https://vocus.cc/article/6a1eeb57fd89780001b66547", // 台積電
+  "2376":"https://vocus.cc/article/6a1eef17fd89780001b7efbb", // 技嘉
+  "3037":"https://vocus.cc/article/6a1eee8ffd89780001b7b70d", // 欣興
+  "3481":"https://vocus.cc/article/6a1ef67ffd89780001bafe03", // 群創
+  "2317":"https://vocus.cc/article/6a1fad2dfd89780001efdd3a", // 鴻海
+  "2327":"https://vocus.cc/article/6a1fa4edfd89780001ed06df", // 國巨
+  "2377":"https://vocus.cc/article/6a1fab9efd89780001ef3ce1", // 微星
+  "3260":"https://vocus.cc/article/6a1fb210fd89780001f16f50", // 威剛
+  "2464":"https://vocus.cc/article/6a1fb3f1fd89780001f225e9", // 盟立
+  "3017":"https://vocus.cc/article/6a1fb8befd89780001f41947", // 奇鋐
+  "INFQ":"https://vocus.cc/article/6a1fc443fd89780001f887c9", // Infleqtion
+  "QTUM":"https://vocus.cc/article/6a1fc604fd89780001f92615", // QTUM 量子ETF
+  "Google":"https://vocus.cc/article/6a1fa878fd89780001ee2469" // Google
+};
+document.querySelectorAll('.chip').forEach(ch=>{
+  const txt=ch.textContent;
+  for(const k in ARTICLES){
+    if(txt.includes(k)){
+      const a=document.createElement('a');
+      a.className='dtag'; a.href=ARTICLES[k]; a.target='_blank'; a.rel='noopener';
+      a.textContent='📰 06/03';
+      ch.appendChild(a); break;
+    }
+  }
+});
+
+// ---- 回檔燈號：讀 data.json，幫每張卡片亮燈 ----
+fetch('./data.json?_='+Date.now()).then(r=>r.json()).then(D=>{
+  const items=D.items||{};
+  const keys=Object.keys(items).sort((a,b)=>b.length-a.length);
+  const ZH={green:'可分批',yellow:'觀察',red:'偏高'};
+  document.querySelectorAll('.chip, .etf').forEach(el=>{
+    const txt=el.textContent;
+    for(const k of keys){
+      if(txt.includes(k)){
+        const it=items[k];
+        const s=document.createElement('span');
+        s.className='light light-'+it.light;
+        s.title='距52週高 回檔 '+it.dd+'%（'+ZH[it.light]+'）';
+        el.insertBefore(s, el.firstChild);
+        break;
+      }
+    }
+  });
+  const u=document.getElementById('lightUpdated');
+  if(u) u.textContent='🚦 回檔燈號更新：'+D.updated+'（每日自動）';
+}).catch(()=>{ const u=document.getElementById('lightUpdated'); if(u) u.textContent='🚦 回檔燈號：資料載入中或暫無'; });
+</script>
+</body>
+</html>
