@@ -90,6 +90,7 @@
 
   .hideStatus-y [data-st="y"], .hideStatus-r [data-st="r"]{display:none}
   .onlyDone .chip:not(.done){display:none}
+  .onlyDD20 .chip:not(.dd-green), .onlyDD20 .etf:not(.dd-green){display:none}
   footer{margin-top:50px; text-align:center; color:var(--muted); font-size:12px; border-top:1px solid var(--line); padding-top:20px}
   .pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--sub);margin-left:6px}
   .etfgrid{display:flex;flex-direction:column;gap:8px;margin-top:10px}
@@ -147,6 +148,7 @@
     <button class="navbtn" id="fAll">顯示全部</button>
     <button class="navbtn" id="fGreen">只看 ✅ 已兌現</button>
     <button class="navbtn" id="fDone">只看 ✓ 已做功課</button>
+    <button class="navbtn" id="fDD20">🟢 只看回檔&gt;20%（可分批）</button>
   </div>
   <div class="legend">
     <span><b>🚦 卡片小圓燈＝回檔（每日更新）</b></span>
@@ -484,11 +486,12 @@ addEventListener('scroll',()=>{
 
 // ---- filters ----
 const body=document.body;
-function clearF(){body.classList.remove('hideStatus-y','hideStatus-r','onlyDone');
-  document.querySelectorAll('#fAll,#fGreen,#fDone').forEach(b=>b.classList.remove('on'));}
+function clearF(){body.classList.remove('hideStatus-y','hideStatus-r','onlyDone','onlyDD20');
+  document.querySelectorAll('#fAll,#fGreen,#fDone,#fDD20').forEach(b=>b.classList.remove('on'));}
 document.getElementById('fAll').onclick=e=>{clearF();e.target.classList.add('on');};
 document.getElementById('fGreen').onclick=e=>{clearF();body.classList.add('hideStatus-y','hideStatus-r');e.target.classList.add('on');};
 document.getElementById('fDone').onclick=e=>{clearF();body.classList.add('onlyDone');e.target.classList.add('on');};
+document.getElementById('fDD20').onclick=e=>{clearF();body.classList.add('onlyDD20');e.target.classList.add('on');};
 document.getElementById('fAll').classList.add('on');
 
 // ---- 方格子文章連結：代號 → 網址，自動掃描所有股票標籤接上 ----
@@ -560,6 +563,7 @@ fetch('./data.json?_='+Date.now()).then(r=>r.json()).then(D=>{
     for(const k of keys){
       if(txt.includes(k)){
         const it=items[k];
+        el.classList.add('dd-'+it.light);
         const s=document.createElement('span');
         s.className='light light-'+it.light;
         s.title='距52週高 回檔 '+it.dd+'%（'+ZH[it.light]+'）';
