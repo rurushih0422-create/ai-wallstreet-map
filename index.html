@@ -103,7 +103,7 @@
   .light{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;flex:0 0 auto;cursor:help}
   .light-green{background:var(--green);box-shadow:0 0 8px var(--green)}
   .light-yellow{background:var(--yellow)}
-  .light-red{background:var(--red);opacity:.5}
+  .light-red{background:#ff4d5e;box-shadow:0 0 6px rgba(255,77,94,.85)}
   .etf-expandable{cursor:pointer}
   .etf-expandable:hover{border-color:var(--blue)}
   .exp-hint{font-size:11px;color:var(--blue);margin-left:8px;flex:0 0 auto;white-space:nowrap}
@@ -116,6 +116,11 @@
   .conc-bar{height:8px;background:#222b3a;border-radius:5px;overflow:hidden;margin:5px 0}
   .conc-bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--yellow),var(--red))}
   .ed-chart{margin:8px 0 4px}
+  .hold{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:12px}
+  .hold .hn{flex:0 0 96px;color:var(--ink)}
+  .hold .hbar{flex:1;height:9px;background:#222b3a;border-radius:5px;overflow:hidden}
+  .hold .hbar > i{display:block;height:100%;background:linear-gradient(90deg,#4f9cf2,#7fb2f7)}
+  .hold .hp{flex:0 0 40px;text-align:right;color:var(--sub)}
 </style>
 </head>
 <body>
@@ -170,6 +175,20 @@
     </div>
 
     <div class="rail" id="rail"></div>
+
+    <div class="layer t" style="border-left-color:#4fd1d9;margin-top:26px">
+      <h3>🔆 矽光子專區（新題材預告）</h3>
+      <div class="callout" style="border-left-color:#4fd1d9;border-color:#1f4d52;background:linear-gradient(180deg,#0e2226,var(--panel2))">
+        <b style="color:#4fd1d9">獨家觀點：</b>目前市面上<b>沒有一檔 ETF 是「純矽光子」</b>。AI 列車上的「光連接（矽光子）」概念多屬<b>中小型股</b>，還沒被大型大盤型 ETF 大量捕捉。<b style="color:#4fd1d9">看好此趨勢的人，現階段「直接主動選股」的爆發力，會遠大於買主題型 ETF。</b>
+      </div>
+      <div class="etfgrid">
+        <div class="etf"><span class="t">光聖 6442</span><span class="mk">台</span><span class="desc">⭐ 矽光子族群<b>獲利最好</b>、目前低檔（近期漲停）</span></div>
+        <div class="etf"><span class="t">聯亞 3081</span><span class="mk">台</span><span class="desc">前波矽光子<b>領頭羊</b>、大漲後暫時休息</span></div>
+        <div class="etf"><span class="t">華星光 4979</span><span class="mk">台</span><span class="desc">搭 Marvell＋輝達合作題材、<b>有營收獲利</b>、還沒跟族群大漲</span></div>
+        <div class="etf"><span class="t">上詮 3363</span><span class="mk">台</span><span class="desc">光被動元件</span></div>
+      </div>
+      <div class="sec-desc" style="margin-top:8px;font-size:12px">🛰️ 延伸（化合物半導體上游／低軌衛星）：穩懋 3105、全新 8068、IET-KY 4971；衛星 PCB 台灣唯一：華通 2313；CCL 銅箔基板：台燿 6274、台光電 2383。</div>
+    </div>
   </section>
 
   <!-- CAKE -->
@@ -522,12 +541,30 @@ const ETF_DETAIL = {
     beta:"設備材料波動大（資本支出循環）", maxdd:"循環性強、回檔可觀", fee:"官網為準", feeNote:"台股 ETF",
     overlap:"⭐ 唯一避開 0050 重疊的半導體 ETF——買「幫台積電蓋廠、做原料」的，不買台積電／輝達本身。"}
 };
-function buildETFPanel(d){
+const ETF_HOLD = {
+  "QQQ":{rows:[["輝達 NVDA",8],["蘋果 AAPL",8],["微軟 MSFT",7],["Amazon",5],["Meta",4],["Google",4]],note:"前 10 大 ≈ 54%"},
+  "XLK":{rows:[["輝達 NVDA",15],["蘋果 AAPL",14],["微軟 MSFT",13],["博通 AVGO",4]],note:"前三大 ≈ 42%、前 10 大 ≈ 62%（三巨頭特調）"},
+  "VGT":{rows:[["輝達 NVDA",18],["蘋果 AAPL",15],["微軟 MSFT",13],["博通 AVGO",4]],note:"前 10 大 ≈ 60%"},
+  "SMH":{rows:[["輝達 NVDA",19],["台積電 TSM",12],["博通 AVGO",9],["超微 AMD",5],["美光 MU",5]],note:"前 10 大 ≈ 70%（最集中）"},
+  "IGV":{rows:[["Palantir",8.8],["微軟 MSFT",8.4],["甲骨文 ORCL",8.2],["Salesforce",7.4],["Palo Alto",5.5]],note:"無單一 >10%，相對分散"},
+  "QTUM":{rows:[],note:"80+ 檔『等權重』，每檔約 1.2%，沒有巨頭（IBM、IonQ、Rigetti、D-Wave…）"},
+  "00941":{rows:[["艾司摩爾 ASML",8],["東京威力",6],["應用材料 AMAT",6],["科林研發 LRCX",5],["科磊 KLA",5],["信越化學",5]],note:"上游設備＋材料、權重相近（約 4–8%）；不含台積電/輝達"}
+};
+function holdHtml(key){
+  const h=ETF_HOLD[key]; if(!h) return '';
+  const bars=(h.rows||[]).map(function(r){
+    var w=Math.min(100, r[1]/20*100);
+    return '<div class="hold"><span class="hn">'+r[0]+'</span><span class="hbar"><i style="width:'+w+'%"></i></span><span class="hp">'+r[1]+'%</span></div>';
+  }).join('');
+  return bars + (h.note?'<div class="ed-t" style="margin-top:5px">'+h.note+'　<span style="opacity:.6">(權重為近期約值)</span></div>':'');
+}
+function buildETFPanel(d, key){
   const p=document.createElement('div'); p.className='etf-detail';
   p.innerHTML =
     '<div class="ed-block"><div class="ed-h">🔍 成分穿透（骨子裡裝什麼）</div>'+
       '<div class="conc-bar"><span style="width:'+d.conc+'%"></span></div>'+
-      '<div class="ed-t">集中度 '+d.conc+'/100　'+d.concText+'</div></div>'+
+      '<div class="ed-t" style="margin-bottom:7px">集中度 '+d.conc+'/100　'+d.concText+'</div>'+
+      holdHtml(key)+'</div>'+
     '<div class="ed-block"><div class="ed-h">🌪️ 波動密碼（它的脾氣）</div>'+
       '<div class="ed-t">Beta（波動度）：<b>'+d.beta+'</b>（>1 ＝ 比大盤兇）｜歷史最大回檔：<b>'+d.maxdd+'</b><br>買進前先有心理準備，遇回檔才不會恐慌賣。</div></div>'+
     '<div class="ed-block"><div class="ed-h">💸 持有成本</div>'+
@@ -557,7 +594,7 @@ document.querySelectorAll('.etf').forEach(row=>{
   row.addEventListener('click',function(e){
     if(e.target.closest('a')) return;
     if(panel){ panel.remove(); panel=null; hint.textContent='▾ 詳解'; return; }
-    panel=buildETFPanel(ETF_DETAIL[key]); row.after(panel); hint.textContent='▴ 收合';
+    panel=buildETFPanel(ETF_DETAIL[key], key); row.after(panel); hint.textContent='▴ 收合';
   });
 });
 </script>
