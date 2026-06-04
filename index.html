@@ -98,6 +98,9 @@
   .onlyRSdd .chip:not(.dd-green):not(.dd-yellow), .onlyRSdd .etf:not(.dd-green):not(.dd-yellow){display:none}
   .rsb{margin-left:4px;font-size:11px;vertical-align:middle}
   footer{margin-top:50px; text-align:center; color:var(--muted); font-size:12px; border-top:1px solid var(--line); padding-top:20px}
+  .rdlink{display:block; color:var(--blue); text-decoration:none; padding:7px 0; font-size:14px; line-height:1.45; border-bottom:1px solid var(--line)}
+  .rdlink:last-child{border-bottom:none}
+  .rdlink:hover{text-decoration:underline; opacity:.85}
   .pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--sub);margin-left:6px}
   .etfgrid{display:flex;flex-direction:column;gap:8px;margin-top:10px}
   .etf{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
@@ -232,6 +235,7 @@
         <span class="chip"><span class="ring big"></span>台達電<span class="code">2308</span></span>
         <span class="chip"><span class="ring big"></span>廣達<span class="code">2382</span></span>
         <span class="chip done"><span class="ring big"></span>Google<span class="code">美股</span><span class="check">✓</span></span>
+        <span class="chip"><span class="ring big"></span>輝達<span class="code">NVDA</span></span>
       </div>
       <div class="how"><b>怎麼操作：</b>核心持有，回檔分批，不追高。</div>
     </div>
@@ -248,6 +252,7 @@
         <span class="chip done"><span class="ring mid"></span>欣興<span class="code">3037</span><span class="check">✓</span></span>
         <span class="chip"><span class="ring mid"></span>華城<span class="code">1519</span></span>
         <span class="chip done"><span class="ring mid"></span>技嘉<span class="code">2376</span><span class="check">✓</span></span>
+        <span class="chip"><span class="ring mid"></span>聯發科<span class="code">2454</span></span>
       </div>
       <div class="how"><b>怎麼操作：</b>順勢參與，跌破關鍵均線就減；別用「便宜」當長抱理由（尤其循環股如威剛）。</div>
     </div>
@@ -399,6 +404,35 @@
     </div>
   </section>
 
+  <!-- 延伸閱讀：沒有單一個股對應、但很重要的題材/ETF/觀念文 -->
+  <section id="readmore">
+    <div class="sec-head"><h2>📚 延伸閱讀</h2><span class="sub">沒有單一個股、但幫你看懂全局的文章</span></div>
+    <p class="sec-desc">地圖上的卡片是「單一個股」，但有些文章是在講「整個族群、ETF 怎麼買、或怎麼讀新聞的觀念」——這些放在這裡，看完地圖再來補全局。非投資建議。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px">
+
+      <div style="border:1px solid var(--line);border-radius:12px;padding:16px">
+        <div style="font-weight:700;margin-bottom:10px">🧩 題材總覽（一次看懂一個族群）</div>
+        <a class="rdlink" href="https://vocus.cc/article/6a215921fd89780001b8ee21" target="_blank" rel="noopener">COMPUTEX 受惠地圖：聯發科真正的故事＋記憶體真龍頭</a>
+        <a class="rdlink" href="https://vocus.cc/article/6a1ef3bbfd89780001b9adc5" target="_blank" rel="noopener">玻璃基板是什麼？6 檔概念股，誰才是真的</a>
+        <a class="rdlink" href="https://vocus.cc/article/6a1ff601fd897800013ba0b6" target="_blank" rel="noopener">矽光子＋低軌衛星 10 檔：誰在賺、誰在賣夢</a>
+        <a class="rdlink" href="https://vocus.cc/article/6a200218fd897800013ef061" target="_blank" rel="noopener">矽光子／CPO 估值解剖：「50 倍不算高」對一半錯一半</a>
+      </div>
+
+      <div style="border:1px solid var(--line);border-radius:12px;padding:16px">
+        <div style="font-weight:700;margin-bottom:10px">💰 ETF 怎麼選、怎麼買</div>
+        <a class="rdlink" href="https://vocus.cc/article/6a2003fbfd897800013f614a" target="_blank" rel="noopener">市面上一堆 ETF 到底怎麼選？其實一輩子只需 3 檔</a>
+        <a class="rdlink" href="https://vocus.cc/article/6a200b45fd897800014133c7" target="_blank" rel="noopener">50 萬 ETF 怎麼配＋怎麼「分批買」才對</a>
+      </div>
+
+      <div style="border:1px solid var(--line);border-radius:12px;padding:16px">
+        <div style="font-weight:700;margin-bottom:10px">🧠 觀念文（怎麼讀新聞、不被題材牽走）</div>
+        <a class="rdlink" href="https://vocus.cc/article/6a211543fd89780001a4f9d2" target="_blank" rel="noopener">「這次不一樣」：財經新聞最貴的一句話</a>
+        <a class="rdlink" href="https://vocus.cc/article/6a21514dfd89780001b6e3c5" target="_blank" rel="noopener">同一週兩篇 AI 報導，一篇喊回歸、一篇喊危機，該信誰？</a>
+      </div>
+
+    </div>
+  </section>
+
   <footer>
     本圖為產業結構整理與個人思考框架，標的僅為各環節代表、非推薦；個股代號與角色屬一般認知，買前請自行查證最新財報與籌碼。非投資建議。<br>
     AI華爾街白話文· 2026-06-03
@@ -525,7 +559,9 @@ const ARTICLES = {
   "2308":"https://vocus.cc/article/6a215dcdfd89780001ba1d90", // 台達電
   "2382":"https://vocus.cc/article/6a216465fd89780001bbe0e8", // 廣達
   "3324":"https://vocus.cc/article/6a213d27fd89780001b16097", // 雙鴻
-  "2313":"https://vocus.cc/article/6a1ffce2fd897800013d7cf8" // 華通
+  "2313":"https://vocus.cc/article/6a1ffce2fd897800013d7cf8", // 華通
+  "NVDA":"https://vocus.cc/article/6a214e44fd89780001b5fda6", // 輝達
+  "2454":"https://vocus.cc/article/6a21677dfd89780001bcadbe" // 聯發科（博通vs聯發科）
 };
 document.querySelectorAll('.chip').forEach(ch=>{
   const txt=ch.textContent;
@@ -543,9 +579,9 @@ document.querySelectorAll('.chip').forEach(ch=>{
 // L=長期(護城河好公司可長抱) M=中期(題材成長·等位置分批) S=短期(波動大/早期/循環/想像·偏觀察)
 const HORIZON = {
   // 長期 · 大型權值績優、可長抱
-  "2330":"L","2308":"L","2317":"L","2382":"L",
+  "2330":"L","2308":"L","2317":"L","2382":"L","NVDA":"L",
   // 中期 · 題材成長、等位置分批
-  "3017":"M","3324":"M","2345":"M","3037":"M","1519":"M","2376":"M","2327":"M","2377":"M",
+  "3017":"M","3324":"M","2345":"M","3037":"M","1519":"M","2376":"M","2327":"M","2377":"M","2454":"M",
   "2049":"M","6188":"M","2313":"M","2383":"M","6274":"M","3105":"M","8068":"M","4931":"M",
   "3595":"M","6442":"M","4979":"M","3081":"M",
   // 短期 · 波動大/早期/循環/想像、偏觀察（不是叫你買）
