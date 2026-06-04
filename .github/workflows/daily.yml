@@ -1,14 +1,15 @@
-name: 每日回檔燈號更新 + 部署
+name: 每日回檔燈號更新（GitHub Pages）
 
 on:
   schedule:
-    - cron: '0 22 * * *'      # 每天 UTC 22:00 ≈ 台灣 06:00（美股收盤後、台股開盤前）
+    - cron: '0 22 * * *'      # 每天 UTC 22:00 ≈ 台灣 06:00
   workflow_dispatch:           # 允許手動觸發
-  push:
-    branches: [ main ]         # 我改網頁 push 後也自動部署
+
+permissions:
+  contents: write
 
 jobs:
-  update-and-deploy:
+  update-lights:
     runs-on: ubuntu-latest
     steps:
       - name: 取得程式碼
@@ -17,9 +18,10 @@ jobs:
       - name: 算回檔燈號（產生 data.json）
         run: python3 scripts/update_lights.py
 
-      - name: 部署到 Netlify
+      - name: 提交 data.json（推送即自動重建 Pages）
         run: |
-          npx -y netlify-cli@latest deploy --prod \
-            --dir . \
-            --site 1f7f6dec-3081-43a8-a787-3b4d377845d9 \
-            --auth "${{ secrets.NETLIFY_AUTH_TOKEN }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git commit -m "chore: 每日回檔燈號更新 [skip ci]" || echo "no changes"
+          git push
