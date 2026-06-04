@@ -94,6 +94,8 @@
   .onlyRS .chip:not(.rs-strong), .onlyRS .etf:not(.rs-strong){display:none}
   .onlyGem .chip:not(.dd-green), .onlyGem .etf:not(.dd-green){display:none}
   .onlyGem .chip:not(.hz-L), .onlyGem .etf:not(.hz-L){display:none}
+  .onlyRSdd .chip:not(.rs-strong), .onlyRSdd .etf:not(.rs-strong){display:none}
+  .onlyRSdd .chip:not(.dd-green):not(.dd-yellow), .onlyRSdd .etf:not(.dd-green):not(.dd-yellow){display:none}
   .rsb{margin-left:4px;font-size:11px;vertical-align:middle}
   footer{margin-top:50px; text-align:center; color:var(--muted); font-size:12px; border-top:1px solid var(--line); padding-top:20px}
   .pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--sub);margin-left:6px}
@@ -155,6 +157,7 @@
     <button class="navbtn" id="fDD20">🟢 只看回檔&gt;20%（可分批）</button>
     <button class="navbtn" id="fRS">💪 相對強／抗跌</button>
     <button class="navbtn" id="fGem">🎯 體質好又回檔</button>
+    <button class="navbtn" id="fRSdd">💪🟡 相對強＋回檔≥10%</button>
   </div>
   <div class="legend">
     <span><b>🚦 卡片小圓燈＝回檔（每日更新）</b></span>
@@ -492,14 +495,15 @@ addEventListener('scroll',()=>{
 
 // ---- filters ----
 const body=document.body;
-function clearF(){body.classList.remove('hideStatus-y','hideStatus-r','onlyDone','onlyDD20','onlyRS','onlyGem');
-  document.querySelectorAll('#fAll,#fGreen,#fDone,#fDD20,#fRS,#fGem').forEach(b=>b.classList.remove('on'));}
+function clearF(){body.classList.remove('hideStatus-y','hideStatus-r','onlyDone','onlyDD20','onlyRS','onlyGem','onlyRSdd');
+  document.querySelectorAll('#fAll,#fGreen,#fDone,#fDD20,#fRS,#fGem,#fRSdd').forEach(b=>b.classList.remove('on'));}
 document.getElementById('fAll').onclick=e=>{clearF();e.target.classList.add('on');};
 document.getElementById('fGreen').onclick=e=>{clearF();body.classList.add('hideStatus-y','hideStatus-r');e.target.classList.add('on');};
 document.getElementById('fDone').onclick=e=>{clearF();body.classList.add('onlyDone');e.target.classList.add('on');};
 document.getElementById('fDD20').onclick=e=>{clearF();body.classList.add('onlyDD20');e.target.classList.add('on');};
 document.getElementById('fRS').onclick=e=>{clearF();body.classList.add('onlyRS');e.target.classList.add('on');};
 document.getElementById('fGem').onclick=e=>{clearF();body.classList.add('onlyGem');e.target.classList.add('on');};
+document.getElementById('fRSdd').onclick=e=>{clearF();body.classList.add('onlyRSdd');e.target.classList.add('on');};
 document.getElementById('fAll').classList.add('on');
 
 // ---- 方格子文章連結：代號 → 網址，自動掃描所有股票標籤接上 ----
