@@ -92,7 +92,7 @@
   .onlyDone .chip:not(.done){display:none}
   .onlyDD20 .chip:not(.dd-green), .onlyDD20 .etf:not(.dd-green){display:none}
   .onlyRS .chip:not(.rs-strong), .onlyRS .etf:not(.rs-strong){display:none}
-  .onlyGem .chip:not(.dd-green), .onlyGem .etf:not(.dd-green){display:none}
+  .onlyGem .chip:not(.dd-green):not(.dd-yellow), .onlyGem .etf:not(.dd-green):not(.dd-yellow){display:none}
   .onlyGem .chip:not(.hz-L), .onlyGem .etf:not(.hz-L){display:none}
   .onlyRSdd .chip:not(.rs-strong), .onlyRSdd .etf:not(.rs-strong){display:none}
   .onlyRSdd .chip:not(.dd-green):not(.dd-yellow), .onlyRSdd .etf:not(.dd-green):not(.dd-yellow){display:none}
@@ -154,16 +154,17 @@
     <button class="navbtn" id="fAll">顯示全部</button>
     <button class="navbtn" id="fGreen">只看 ✅ 已兌現</button>
     <button class="navbtn" id="fDone">只看 ✓ 已做功課</button>
-    <button class="navbtn" id="fDD20">🟢 只看回檔&gt;20%（可分批）</button>
+    <button class="navbtn" id="fDD20">🟢 只看綠燈（可分批）</button>
     <button class="navbtn" id="fRS">💪 相對強／抗跌</button>
-    <button class="navbtn" id="fGem">🎯 體質好又回檔</button>
-    <button class="navbtn" id="fRSdd">💪🟡 相對強＋回檔≥10%</button>
+    <button class="navbtn" id="fGem">🎯 體質好＋回檔（可入場·黃=5~10%/綠=深）</button>
+    <button class="navbtn" id="fRSdd">💪 相對強＋回檔</button>
   </div>
   <div class="legend">
-    <span><b>🚦 卡片小圓燈＝回檔（每日更新）</b></span>
-    <span><span class="light light-green"></span>回檔&gt;20% 可分批</span>
-    <span><span class="light light-yellow"></span>10–20% 觀察</span>
-    <span><span class="light light-red"></span>&lt;10% 偏高</span>
+    <span><b>🚦 卡片小圓燈＝回檔（依體質分級·每日更新）</b></span>
+    <span><span class="light light-green"></span>🟢 可分批</span>
+    <span><span class="light light-yellow"></span>🟡 觀察</span>
+    <span><span class="light light-red"></span>🔴 偏高</span>
+    <span style="opacity:.7">綠燈門檻依體質：體質好(長)回檔≥10%／中型≥15%／投機(短)≥20%；體質好的黃燈＝回檔5~10%</span>
     <span style="opacity:.4">｜</span>
     <span><b>方塊＝體質</b></span>
     <span><span class="ring big"></span>大型權值</span>
@@ -576,10 +577,17 @@ fetch('./data.json?_='+Date.now()).then(r=>r.json()).then(D=>{
     for(const k of keys){
       if(txt.includes(k)){
         const it=items[k];
-        el.classList.add('dd-'+it.light);
+        const dd=it.dd;
+        // 依體質分級門檻：[綠燈, 黃燈] 回檔%
+        const tier=el.classList.contains('hz-L')?'L':el.classList.contains('hz-M')?'M':el.classList.contains('hz-S')?'S':'D';
+        const TH={L:[10,5],M:[15,10],S:[20,10],D:[20,10]};
+        const TIERNAME={L:'體質好',M:'中型成長',S:'投機/高波動',D:'一般'};
+        const g=TH[tier][0], y=TH[tier][1];
+        const lt = dd>g?'green':(dd>=y?'yellow':'red');
+        el.classList.add('dd-'+lt);
         const s=document.createElement('span');
-        s.className='light light-'+it.light;
-        let tip='距52週高 回檔 '+it.dd+'%（'+ZH[it.light]+'）';
+        s.className='light light-'+lt;
+        let tip='距52週高 回檔 '+dd+'%（'+ZH[lt]+'｜'+TIERNAME[tier]+'：綠燈門檻 >'+g+'%）';
         if(typeof it.rs==='number'){
           el.classList.add(it.rs>0?'rs-strong':'rs-weak');
           tip+='｜近月相對大盤 '+(it.rs>0?'+':'')+it.rs+'%';
