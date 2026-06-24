@@ -183,22 +183,6 @@
   .conc-bar{height:8px;background:#222b3a;border-radius:5px;overflow:hidden;margin:5px 0}
   .conc-bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--yellow),var(--red))}
   .top-ticker{background:#0b0e14;border-bottom:1px solid var(--line);padding:0}
-  /* ── Mobile header & tab bar ── */
-  .m-header{display:none}
-  .m-tabbar{display:none}
-  @media(max-width:680px){
-    .m-header{display:flex;justify-content:space-between;align-items:center;position:fixed;top:0;left:0;right:0;z-index:400;background:rgba(11,14,20,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:10px 18px;font-size:13px}
-    .m-header a{color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:6px;font-weight:600}
-    .m-rdot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex:0 0 auto}
-    .m-rdot.warn{background:var(--red);box-shadow:0 0 6px rgba(255,77,94,.8)}
-    .m-header .m-lbl{font-size:12px;color:var(--sub);font-weight:400}
-    .m-tabbar{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:400;background:rgba(11,14,20,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line)}
-    .m-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px 0 14px;font-size:11px;color:var(--sub);text-decoration:none;gap:2px;transition:.15s}
-    .m-tab-ic{font-size:19px;line-height:1}
-    .m-tab.on{color:var(--blue)}
-    body{padding-top:46px;padding-bottom:68px}
-    .top-ticker{display:none}
-  }
   .ed-chart{margin:8px 0 4px}
   .hold{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:12px}
   .hold .hn{flex:0 0 96px;color:var(--ink)}
@@ -208,12 +192,6 @@
 </style>
 </head>
 <body>
-
-<!-- Mobile sticky header -->
-<div class="m-header">
-  <a href="#monitor"><span class="m-rdot" id="mRdot"></span>🛑 風控 <span class="m-lbl" id="mRisk">正常</span></a>
-  <a href="#mood">🌡️ 溫度 <span class="m-lbl" id="mTemp">—</span></a>
-</div>
 
 <div class="top-ticker">
   <div class="tradingview-widget-container">
@@ -894,32 +872,5 @@ document.querySelectorAll('.etf').forEach(row=>{
 });
 </script>
 
-<!-- Mobile bottom tab bar -->
-<div class="m-tabbar">
-  <a href="#train" class="m-tab on" data-sec="train"><span class="m-tab-ic">🚂</span>板塊</a>
-  <a href="#cake" class="m-tab" data-sec="cake"><span class="m-tab-ic">🍰</span>配置</a>
-  <a href="#etf" class="m-tab" data-sec="etf"><span class="m-tab-ic">💰</span>ETF</a>
-</div>
-
-<script>
-// Mobile header: risk status from monitor section
-(function(){
-  const dot=document.getElementById('mRdot');
-  const riskEl=document.getElementById('mRisk');
-  const mon=document.getElementById('monitor');
-  if(mon){
-    const reds=mon.querySelectorAll('.light-red');
-    if(reds.length>0){dot.classList.add('warn');riskEl.textContent='留意';}
-  }
-  // Active tab on scroll
-  const secs=['train','cake','etf'].map(id=>document.getElementById(id));
-  const tabs=document.querySelectorAll('.m-tab');
-  window.addEventListener('scroll',function(){
-    let cur=0;
-    secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<150)cur=i;});
-    tabs.forEach((t,i)=>t.classList.toggle('on',i===cur));
-  },{passive:true});
-})();
-</script>
 </body>
 </html>
