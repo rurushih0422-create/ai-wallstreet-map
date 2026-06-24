@@ -70,6 +70,10 @@
   .sub-hd{width:100%;font-size:10px;font-weight:700;color:var(--sub);opacity:.65;letter-spacing:.08em;padding:2px 2px 0;margin-bottom:-2px}
   .chip{display:inline-flex; align-items:center; gap:5px; background:var(--panel2); border:1px solid var(--line); border-radius:999px; padding:4px 10px; font-size:12.5px}
   .chip .code{color:var(--muted); font-size:11px}
+  .chip.dd-green .code::after{content:' 🛒';font-size:10px;opacity:.8}
+  .chip.dd-deep .code::after{content:' 💰';font-size:10px;opacity:.8}
+  .etf.dd-green .code::after{content:' 🛒';font-size:10px;opacity:.8}
+  .etf.dd-deep .code::after{content:' 💰';font-size:10px;opacity:.8}
   .chip.done{box-shadow:inset 0 0 0 1px rgba(40,199,135,.35)}
   .chip .check{color:var(--green); font-weight:700}
 
@@ -209,15 +213,15 @@
   <div class="bar-filters">
     <div class="frow">
       <span class="frow-label">龍頭</span>
-      <button class="navbtn" id="fL9" title="龍頭大公司回檔 10–19%，長線定期定額加碼點">🏦🛒 龍頭打九折</button>
-      <button class="navbtn" id="fL8" title="龍頭大公司回檔 20% 以上，技術性熊市重裝進場時機">🏦💰 龍頭打八折</button>
-      <button class="navbtn" id="fLGem" title="龍頭大公司回檔且比大盤多跌，市場情緒非理性拋售">🏦🎯 龍頭被錯殺</button>
+      <button class="navbtn" id="fL9" title="龍頭大公司回檔 10–19%，長線定期定額加碼點">🛒 龍頭打九折</button>
+      <button class="navbtn" id="fL8" title="龍頭大公司回檔 20% 以上，技術性熊市重裝進場時機">💰 龍頭打八折</button>
+      <button class="navbtn" id="fLGem" title="龍頭大公司回檔且比大盤多跌，市場情緒非理性拋售">🎯 龍頭被錯殺</button>
     </div>
     <div class="frow">
       <span class="frow-label">中型</span>
-      <button class="navbtn" id="fMdd" title="中型成長股回檔 15% 以上，進入波段觀察區">📈💎 中型打折</button>
-      <button class="navbtn" id="fMRS" title="中型股跑贏大盤但同時有折扣，強勢股被大盤拖累送特價">📈🔥 中型強勢打折</button>
-      <button class="navbtn" id="fMGem" title="中型題材股跟弱勢補跌，左側分批接須小心">📈🎯 中型被錯殺</button>
+      <button class="navbtn" id="fMdd" title="中型成長股回檔 15% 以上，進入波段觀察區">💎 中型打折</button>
+      <button class="navbtn" id="fMRS" title="中型股跑贏大盤但同時有折扣，強勢股被大盤拖累送特價">🔥 中型強勢打折</button>
+      <button class="navbtn" id="fMGem" title="中型題材股跟弱勢補跌，左側分批接須小心">🎯 中型被錯殺</button>
     </div>
     <div class="frow">
       <span class="frow-label"></span>
