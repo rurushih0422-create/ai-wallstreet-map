@@ -30,16 +30,32 @@ TW_KEYS = {k for k, v in SYMBOLS.items() if v.endswith(".TW")}
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 def fetch(sym):
-    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}?interval=1d&range=5d"
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}?interval=1d&range=2mo"
     req = urllib.request.Request(url, headers=HEADERS)
     with urllib.request.urlopen(req, timeout=8) as r:
         d = json.loads(r.read())
-    meta = d['chart']['result'][0]['meta']
+    res = d['chart']['result'][0]
+    meta = res['meta']
     price = meta.get('regularMarketPrice') or meta.get('previousClose')
     high52 = meta.get('fiftyTwoWeekHigh')
-    prev = meta.get('chartPreviousClose') or meta.get('previousClose')
+    # 收盤序列（過濾 null）；此端點的 meta.previousClose 常為 None，改用序列算昨收
+    try:
+        closes = res['indicators']['quote'][0]['close']
+        vals = [c for c in closes if c is not None]
+    except (KeyError, IndexError, TypeError):
+        vals = []
+    # 昨收：最後一根若≈現價代表是「今天」，取倒數第二根；否則取最後一根
+    prev = None
+    if len(vals) >= 2:
+        prev = vals[-2] if price and abs(price - vals[-1]) / price < 0.001 else vals[-1]
+    elif vals:
+        prev = vals[-1]
+    if not prev:
+        prev = meta.get('chartPreviousClose')
     chg1d = round((price - prev) / prev * 100, 1) if prev and price else 0
-    return price, high52, chg1d
+    # MA20（月線）：最近 20 根收盤價平均
+    ma20 = (sum(vals[-20:]) / 20) if len(vals) >= 20 else (sum(vals) / len(vals) if vals else None)
+    return price, high52, chg1d, ma20
 
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -52,12 +68,14 @@ def main():
     fresh = {}
     for key, sym in SYMBOLS.items():
         try:
-            price, high52, chg1d = fetch(sym)
+            price, high52, chg1d, ma20 = fetch(sym)
             if price and high52:
                 dd = round((high52 - price) / high52 * 100, 1)
+                ma20up = (price >= ma20) if ma20 else None
                 fresh[key] = {"price": round(price, 2), "high": round(high52, 2),
-                              "dd": dd, "chg1d": chg1d}
-                print(f"✓ {key:8s}  {price:>8.2f}  dd:{dd:>5.1f}%  1d:{chg1d:>+5.1f}%")
+                              "dd": dd, "chg1d": chg1d, "ma20up": ma20up}
+                arrow = ("↑" if ma20up else "↓") if ma20up is not None else "?"
+                print(f"✓ {key:8s}  {price:>8.2f}  dd:{dd:>5.1f}%  1d:{chg1d:>+5.1f}%  月線:{arrow}")
             else:
                 print(f"✗ {key}: no price")
         except Exception as e:
@@ -80,7 +98,8 @@ def main():
         light = "green" if fd['dd'] > 20 else ("yellow" if fd['dd'] >= 7 else "red")
         new_items[key] = {
             "price": fd['price'], "high": fd['high'], "dd": fd['dd'],
-            "light": light, "r20": fd['chg1d'], "rs": rs
+            "light": light, "r20": fd['chg1d'], "rs": rs,
+            "ma20up": fd.get('ma20up')
         }
 
     from datetime import datetime

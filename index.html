@@ -139,6 +139,9 @@
   .onlyRS .chip:not(.rs-strong),.onlyRS .etf:not(.rs-strong){display:none}
   .onlyRS .chip.dd-green,.onlyRS .etf.dd-green{display:none}
   .rsb{margin-left:4px;font-size:11px;vertical-align:middle}
+  .matag{margin-left:5px;font-size:10px;vertical-align:middle;padding:0 4px;border-radius:3px;font-weight:600;letter-spacing:.3px}
+  .ma-up{color:#93a7bd;background:rgba(147,167,189,.12)}
+  .ma-dn{color:#b79a91;background:rgba(183,154,145,.14)}
   /* 動作標籤 */
   .atag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;margin-left:5px;line-height:1.5;vertical-align:middle;white-space:nowrap}
   .atag.buy{background:rgba(40,199,135,.2);color:#3fd89a;border:1px solid rgba(40,199,135,.5)}
@@ -776,6 +779,13 @@ const HTIP={L:"長期 · 護城河好公司、可長抱",M:"中期 · 題材成�
           if(it.rs>0){ const b=document.createElement('span'); b.className='rsb'; b.textContent='💪'; b.title='近月贏大盤 +'+it.rs+'%（相對強／抗跌）'; el.appendChild(b); }
           const r20=it.r20||it.chg1d||0;
           if(it.rs < -10 && r20 < -5) el.classList.add('danger');
+        }
+        if(typeof it.ma20up==='boolean'){
+          const m=document.createElement('span');
+          m.className='matag '+(it.ma20up?'ma-up':'ma-dn');
+          m.textContent=it.ma20up?'↑月線':'↓月線';
+          m.title=it.ma20up?'站上月線（MA20）：短期趨勢偏多、還沒轉弱':'跌破月線（MA20）：短期趨勢轉弱、比較像真回檔';
+          el.appendChild(m);
         }
         s.title=tip;
         el.insertBefore(s, el.firstChild);
