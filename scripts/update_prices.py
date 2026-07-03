@@ -24,12 +24,33 @@ SYMBOLS = {
     "QTUM":"QTUM","CIBR":"CIBR","IAU":"IAU","GLD":"GLD","IBIT":"IBIT",
     "SGOV":"SGOV","Google":"GOOGL","INFQ":"INFQ","IONQ":"IONQ",
     "RGTI":"RGTI","QBTS":"QBTS","LSCC":"LSCC",
+    # 功率元件 · 台股（.TW 找不到會自動改試 .TWO 上櫃）
+    "2303":"2303.TW","5347":"5347.TW","3711":"3711.TW","2449":"2449.TW","3707":"3707.TW",
+    "3016":"3016.TW","8255":"8255.TW","2342":"2342.TW","3438":"3438.TW","8081":"8081.TW",
+    "6525":"6525.TW","5299":"5299.TW","6435":"6435.TW","8261":"8261.TW",
+    "2454":"2454.TW",
+    # 功率元件 · 國際 IDM 大廠
+    "ONsemi":"ON","STM":"STM","WOLF":"WOLF","IFNNY":"IFNNY","Rohm":"6963.T","Fuji":"6504.T",
 }
 
 TW_KEYS = {k for k, v in SYMBOLS.items() if v.endswith(".TW")}
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 def fetch(sym):
+    """台股 .TW 找不到時，自動改試 .TWO（上櫃）"""
+    candidates = [sym]
+    if sym.endswith('.TW'):
+        candidates.append(sym[:-3] + '.TWO')
+    err = None
+    for s in candidates:
+        try:
+            return _fetch_one(s)
+        except Exception as e:
+            err = e
+            continue
+    raise err
+
+def _fetch_one(sym):
     url = f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}?interval=1d&range=2mo"
     req = urllib.request.Request(url, headers=HEADERS)
     with urllib.request.urlopen(req, timeout=8) as r:

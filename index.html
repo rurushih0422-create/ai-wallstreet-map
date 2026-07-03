@@ -234,6 +234,7 @@
   <div class="bar-in">
     <a class="navbtn on" href="#train">🚂 板塊</a>
     <a class="navbtn" href="#cake">🍰 配置</a>
+    <a class="navbtn" href="#power">⚡ 功率</a>
     <a class="navbtn" href="#etf">💰 ETF</a>
   </div>
   <div class="legend">
@@ -334,6 +335,56 @@
         <span class="chip"><span class="ring small"></span>聯亞<span class="code">3081</span></span>
       </div>
       <div class="how"><b>怎麼操作：</b>總部位設上限（例如 ≤15–20%）、單檔設停損；2027 才量產的（🔴）只能小賭未來、不能重押。</div>
+    </div>
+  </section>
+
+  <!-- POWER 功率元件 -->
+  <section id="power">
+    <div class="sec-head"><h2>⚡ 功率元件</h2><span class="sub">控制/轉換電能的半導體 · SiC/GaN/MOSFET/IGBT</span></div>
+    <p class="sec-desc">跟算力晶片（CPU/GPU）不同，功率元件是電子設備的「心臟瓣膜」，負責高壓大電流的切換。受惠 AI 伺服器電源、電動車 800V、綠能儲能、快充。按公司大小分三層（燈號、月線同其他板塊）。</p>
+
+    <div class="layer b">
+      <h3>🟫 大型 · 龍頭 / IDM 大廠</h3>
+      <div class="meta">全球/台灣大型、IDM 整合大廠 — 波動最小，想參與這賽道優先看這層</div>
+      <div class="chips">
+        <span class="chip"><span class="ring big"></span>聯電<span class="code">2303</span></span>
+        <span class="chip"><span class="ring big"></span>世界先進<span class="code">5347</span></span>
+        <span class="chip"><span class="ring big"></span>日月光投控<span class="code">3711</span></span>
+        <span class="chip"><span class="ring big"></span>京元電<span class="code">2449</span></span>
+        <span class="chip"><span class="ring big"></span>安森美<span class="code">ONsemi</span></span>
+        <span class="chip"><span class="ring big"></span>意法半導體<span class="code">STM</span></span>
+        <span class="chip"><span class="ring big"></span>英飛凌<span class="code">IFNNY</span></span>
+        <span class="chip"><span class="ring big"></span>羅姆<span class="code">Rohm</span></span>
+        <span class="chip"><span class="ring big"></span>富士電機<span class="code">Fuji</span></span>
+      </div>
+      <div class="how"><b>怎麼操作：</b>龍頭波動小、有訂價權；台積電(2330) 在配置地基層也做 SiC/GaN 代工。</div>
+    </div>
+
+    <div class="layer m">
+      <h3>🟨 中型 · 磊晶 / 模組 / 電源設計</h3>
+      <div class="meta">第三代半導體(SiC/GaN)磊晶、車用模組、電源 IC — 成長彈性大、波動中等</div>
+      <div class="chips">
+        <span class="chip"><span class="ring mid"></span>漢磊<span class="code">3707</span></span>
+        <span class="chip"><span class="ring mid"></span>嘉晶<span class="code">3016</span></span>
+        <span class="chip"><span class="ring mid"></span>朋程<span class="code">8255</span></span>
+        <span class="chip"><span class="ring mid"></span>茂矽<span class="code">2342</span></span>
+        <span class="chip"><span class="ring mid"></span>類比科<span class="code">3438</span></span>
+        <span class="chip"><span class="ring mid"></span>致新<span class="code">8081</span></span>
+        <span class="chip"><span class="ring mid"></span>捷敏-KY<span class="code">6525</span></span>
+        <span class="chip"><span class="ring mid"></span>Wolfspeed<span class="code">WOLF</span></span>
+      </div>
+      <div class="how"><b>怎麼操作：</b>題材成長股，回檔位置分批；Wolfspeed 是純 SiC 材料龍頭但財務波動大，偏觀察。</div>
+    </div>
+
+    <div class="layer t">
+      <h3>🟥 小型 · MOSFET 台廠</h3>
+      <div class="meta">傳統 MOSFET 台廠，往伺服器/車用轉型中 — 彈性大、籌碼淺</div>
+      <div class="chips">
+        <span class="chip"><span class="ring small"></span>杰力<span class="code">5299</span></span>
+        <span class="chip"><span class="ring small"></span>大中<span class="code">6435</span></span>
+        <span class="chip"><span class="ring small"></span>富鼎<span class="code">8261</span></span>
+      </div>
+      <div class="how"><b>怎麼操作：</b>小型股波動大，總部位設上限、單檔停損，別把「便宜」當長抱理由。</div>
     </div>
   </section>
 
@@ -730,7 +781,13 @@ const HORIZON = {
   "3595":"M","6442":"M","4979":"M","3081":"M",
   // 短期 · 波動大/早期/循環/想像、偏觀察（不是叫你買）
   "3260":"S","4967":"S","2464":"S","3481":"S","8027":"S","4971":"S","3363":"S",
-  "INFQ":"S","IONQ":"S","RGTI":"S","QBTS":"S"
+  "INFQ":"S","IONQ":"S","RGTI":"S","QBTS":"S",
+  // 功率元件 · 大型龍頭/IDM
+  "2303":"L","5347":"L","3711":"L","2449":"L","ONsemi":"L","STM":"L","IFNNY":"L","Rohm":"L","Fuji":"L",
+  // 功率元件 · 中型 磊晶/模組/電源
+  "3707":"M","3016":"M","8255":"M","2342":"M","3438":"M","8081":"M","6525":"M","WOLF":"M",
+  // 功率元件 · 小型 MOSFET 台廠
+  "5299":"S","6435":"S","8261":"S"
 };
 const HLABEL={L:"🏦",M:"📈",S:"⚡"};
 const HTIP={L:"長期 · 護城河好公司、可長抱",M:"中期 · 題材成長、等位置再分批",S:"短期 · 波動大/早期/循環/想像，偏觀察（非買進建議）"};
