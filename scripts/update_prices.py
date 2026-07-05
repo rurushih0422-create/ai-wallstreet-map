@@ -24,6 +24,8 @@ SYMBOLS = {
     "QTUM":"QTUM","CIBR":"CIBR","IAU":"IAU","GLD":"GLD","IBIT":"IBIT",
     "SGOV":"SGOV","Google":"GOOGL","INFQ":"INFQ","IONQ":"IONQ",
     "RGTI":"RGTI","QBTS":"QBTS","LSCC":"LSCC",
+    # 記憶體（美光 + Roundhill 記憶體 ETF，含美光/SK海力士/三星）
+    "MU":"MU","DRAM":"DRAM",
     # 功率元件 · 台股（.TW 找不到會自動改試 .TWO 上櫃）
     "2303":"2303.TW","5347":"5347.TW","3711":"3711.TW","2449":"2449.TW","3707":"3707.TW",
     "3016":"3016.TW","8255":"8255.TW","2342":"2342.TW","3438":"3438.TW","8081":"8081.TW",
